@@ -86,7 +86,7 @@ The system follows a pipeline approach:
 * **Core Logic:** Python 3.10
 * **API Framework:** FastAPI + Uvicorn
 * **Model Runtime:** Ollama (Local Inference)
-* **LLMs Used:** Mistral-7B, LLaMA-3
+* **LLMs Used:** LLaMA-3
 * **Vector Database:** FAISS (for RAG experiments)
 * **Frontend:** React.js + Tailwind CSS
 * **Tools:** Postman, Git, VS Code
