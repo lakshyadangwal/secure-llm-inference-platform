@@ -346,6 +346,18 @@ async def scan_document(file: UploadFile = File(...)):
     result = await rag_scanner.process_file(file, rules_engine.evaluate)
     return result
 
+@app.get("/api/metrics/geodata")
+async def get_geodata():
+    """Mock geolocation data for the Threat Map"""
+    # Returns some hardcoded coordinates roughly matching US/EU/Asia data centers
+    points = [
+        {"coordinates": [-122.4194, 37.7749], "threat": "jailbreak", "intensity": random.randint(1,5)},
+        {"coordinates": [-74.0060, 40.7128], "threat": "injection", "intensity": random.randint(1,5)},
+        {"coordinates": [-0.1276, 51.5074], "threat": "data_extraction", "intensity": random.randint(1,5)},
+        {"coordinates": [37.6173, 55.7558], "threat": "encoding", "intensity": random.randint(5,10)},
+        {"coordinates": [116.4074, 39.9042], "threat": "jailbreak", "intensity": random.randint(3,8)}
+    ]
+
 @app.get("/api/stats")
 async def get_stats():
     """Get current system statistics"""
