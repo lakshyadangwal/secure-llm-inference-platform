@@ -45,4 +45,65 @@ export default function GoogleLogin({ onLoginSuccess, onLogout }) {
         const interval = setInterval(() => setScanLine(p => (p + 1) % 100), 30);
         return () => clearInterval(interval);
     }, []);
+
+    function handleCredentialResponse(response) {
+        const payload = JSON.parse(atob(response.credential.split(".")[1]));
+        const userData = { name: payload.name, email: payload.email, picture: payload.picture };
+        setUser(userData);
+        sessionStorage.setItem("ns_google_user", JSON.stringify(userData));
+        sessionStorage.setItem("ns_google_credential", response.credential);
+        setShowModal(false);
+        onLoginSuccess?.(userData);
+    }
+
+    function logout() {
+        sessionStorage.removeItem("ns_google_user");
+        sessionStorage.removeItem("ns_google_credential");
+        setUser(null); setShowDropdown(false);
+        window.google?.accounts?.id?.disableAutoSelect();
+        onLogout?.();
+    }
+
+    const teal = "#00ffb4";
+
+    return (
+        <>
+            <div style={{ position: "relative" }}>
+                {!user ? (
+                    <button onClick={() => setShowModal(true)}
+                        style={{
+                            display: "flex", alignItems: "center", gap: 8, padding: "7px 14px",
+                            background: "transparent", border: "1px solid rgba(0,255,180,0.4)", borderRadius: 6,
+                            color: teal, fontSize: 12, fontFamily: "Courier New, monospace",
+                            fontWeight: 700, letterSpacing: "0.08em", cursor: "pointer", textTransform: "uppercase"
+                        }}
+                        onMouseEnter={e => { e.currentTarget.style.background = "rgba(0,255,180,0.08)"; e.currentTarget.style.borderColor = teal; e.currentTarget.style.boxShadow = "0 0 12px rgba(0,255,180,0.3)"; }}
+                        onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.borderColor = "rgba(0,255,180,0.4)"; e.currentTarget.style.boxShadow = "none"; }}
+                    >
+                        <span style={{ fontSize: 14 }}>&#x2B21;</span> LOGIN
+                    </button>
+                ) : (
+                    <button onClick={() => setShowDropdown(!showDropdown)}
+                        style={{
+                            display: "flex", alignItems: "center", gap: 8, padding: "5px 12px 5px 6px",
+                            background: "rgba(0,255,180,0.06)", border: "1px solid rgba(0,255,180,0.5)",
+                            borderRadius: 6, cursor: "pointer"
+                        }}
+                        onMouseEnter={e => e.currentTarget.style.background = "rgba(0,255,180,0.12)"}
+                        onMouseLeave={e => e.currentTarget.style.background = "rgba(0,255,180,0.06)"}
+                    >
+                        {user.picture
+                            ? <img src={user.picture} alt="" style={{ width: 26, height: 26, borderRadius: "50%", border: "1px solid #00ffb4" }} />
+                            : <div style={{ width: 26, height: 26, borderRadius: "50%", background: "linear-gradient(135deg,#00ffb4,#0ea5e9)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, color: "#0a0f1a" }}>{user.name.charAt(0)}</div>
+                        }
+                        <div>
+                            <div style={{ fontSize: 11, fontFamily: "Courier New, monospace", color: teal, fontWeight: 700, lineHeight: 1.2 }}>{user.name.split(" ")[0].toUpperCase()}</div>
+                            <div style={{ fontSize: 9, color: "rgba(0,255,180,0.5)" }}>AUTHORIZED</div>
+                        </div>
+                        <span style={{ color: "rgba(0,255,180,0.5)", fontSize: 10 }}>v</span>
+                    </button>
+                )}
+            </div>
+        </>
+    );
 }
