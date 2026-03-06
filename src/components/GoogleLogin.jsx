@@ -1,15 +1,12 @@
 import { useState, useEffect } from "react";
-
 // Google Client ID from environment variables
 const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-
 export default function GoogleLogin({ onLoginSuccess, onLogout }) {
     const [user, setUser] = useState(null);
     const [sdkReady, setSdkReady] = useState(false);
     const [showDropdown, setShowDropdown] = useState(false);
     const [showModal, setShowModal] = useState(false);
     const [scanLine, setScanLine] = useState(0);
-
     // Restore session + load Google GSI SDK
     useEffect(() => {
         const saved = sessionStorage.getItem("ns_google_user");
@@ -21,14 +18,12 @@ export default function GoogleLogin({ onLoginSuccess, onLogout }) {
         document.body.appendChild(script);
         return () => document.body.removeChild(script);
     }, []);
-
     // Allow external components to open the login modal
     useEffect(() => {
         const handler = () => setShowModal(true);
         window.addEventListener('ns-open-login', handler);
         return () => window.removeEventListener('ns-open-login', handler);
     }, []);
-
     // Render the Google Sign-In button once SDK + modal are ready
     useEffect(() => {
         if (!sdkReady || user || !showModal) return;
@@ -39,13 +34,11 @@ export default function GoogleLogin({ onLoginSuccess, onLogout }) {
             window.google.accounts.id.renderButton(el, { theme: "filled_black", size: "large", width: 320 });
         }, 150);
     }, [sdkReady, showModal, user]);
-
     // Animate scan line across modal
     useEffect(() => {
         const interval = setInterval(() => setScanLine(p => (p + 1) % 100), 30);
         return () => clearInterval(interval);
     }, []);
-
     function handleCredentialResponse(response) {
         const payload = JSON.parse(atob(response.credential.split(".")[1]));
         const userData = { name: payload.name, email: payload.email, picture: payload.picture };
@@ -55,7 +48,6 @@ export default function GoogleLogin({ onLoginSuccess, onLogout }) {
         setShowModal(false);
         onLoginSuccess?.(userData);
     }
-
     function logout() {
         sessionStorage.removeItem("ns_google_user");
         sessionStorage.removeItem("ns_google_credential");
@@ -63,9 +55,7 @@ export default function GoogleLogin({ onLoginSuccess, onLogout }) {
         window.google?.accounts?.id?.disableAutoSelect();
         onLogout?.();
     }
-
     const teal = "#00ffb4";
-
     return (
         <>
             <div style={{ position: "relative" }}>
@@ -140,6 +130,7 @@ export default function GoogleLogin({ onLoginSuccess, onLogout }) {
                 )}
             </div>
             {showDropdown && <div style={{ position: "fixed", inset: 0, zIndex: 999 }} onClick={() => setShowDropdown(false)} />}
+
             {showModal && (
                 <div style={{
                     position: "fixed", inset: 0, zIndex: 2000, background: "rgba(0,0,0,0.85)",
@@ -165,6 +156,59 @@ export default function GoogleLogin({ onLoginSuccess, onLogout }) {
                                 </span>
                             </div>
                             <button onClick={() => setShowModal(false)} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.4)", cursor: "pointer", fontSize: 18 }}>x</button>
+                        </div>
+                        {/* Body */}
+                        <div style={{ padding: "32px 36px 36px" }}>
+                            <div style={{ textAlign: "center", marginBottom: 24 }}>
+                                <div style={{
+                                    display: "inline-flex", alignItems: "center", justifyContent: "center",
+                                    width: 64, height: 64, borderRadius: "50%", background: "rgba(0,255,180,0.08)",
+                                    border: "2px solid rgba(0,255,180,0.3)", fontSize: 28, marginBottom: 16,
+                                    boxShadow: "0 0 24px rgba(0,255,180,0.15)"
+                                }}>S</div>
+                                <div style={{ fontSize: 20, fontWeight: 700, color: "#e2f8f0", fontFamily: "Courier New, monospace", letterSpacing: "0.05em", marginBottom: 6 }}>
+                                    IDENTITY VERIFICATION
+                                </div>
+                                <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", lineHeight: 1.5 }}>
+                                    Authenticate via Google to access<br />Neuro-Sentry command interface
+                                </div>
+                            </div>
+                            <div style={{
+                                background: "rgba(0,255,180,0.04)", border: "1px solid rgba(0,255,180,0.15)",
+                                borderRadius: 8, padding: "10px 14px", marginBottom: 24, fontSize: 11,
+                                fontFamily: "monospace", color: "rgba(0,255,180,0.7)", lineHeight: 1.7
+                            }}>
+                                <span style={{ color: teal }}>&#x25B6;</span> OAuth 2.0 secure channel active<br />
+                                <span style={{ color: teal }}>&#x25B6;</span> End-to-end encryption enabled<br />
+                                <span style={{ color: teal }}>&#x25B6;</span> Session token lifetime: 24h
+                            </div>
+                            <div id="ns-google-btn" style={{ marginBottom: 12, display: "flex", justifyContent: "center" }} />
+                            <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "16px 0" }}>
+                                <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.08)" }} />
+                                <span style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", fontFamily: "monospace" }}>OR</span>
+                                <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.08)" }} />
+                            </div>
+                            <button onClick={() => {
+                                if (!window.google) return;
+                                window.google.accounts.id.initialize({ client_id: CLIENT_ID, callback: handleCredentialResponse });
+                                window.google.accounts.id.prompt();
+                            }}
+                                style={{
+                                    display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
+                                    width: "100%", padding: 12, background: "rgba(0,255,180,0.06)",
+                                    border: "1px solid rgba(0,255,180,0.35)", borderRadius: 8,
+                                    fontSize: 13, fontWeight: 700, color: teal, cursor: "pointer",
+                                    fontFamily: "Courier New, monospace", letterSpacing: "0.06em"
+                                }}
+                                onMouseEnter={e => { e.currentTarget.style.background = "rgba(0,255,180,0.12)"; e.currentTarget.style.boxShadow = "0 0 16px rgba(0,255,180,0.2)"; }}
+                                onMouseLeave={e => { e.currentTarget.style.background = "rgba(0,255,180,0.06)"; e.currentTarget.style.boxShadow = "none"; }}
+                            >
+                                <GoogleIcon /> CONNECT WITH GOOGLE
+                            </button>
+                            <p style={{ fontSize: 10, color: "rgba(255,255,255,0.25)", marginTop: 20, textAlign: "center", lineHeight: 1.6, fontFamily: "monospace" }}>
+                                AUTHENTICATION REQUIRED FOR FULL SYSTEM ACCESS<br />
+                                SESSION DATA IS ENCRYPTED AND NOT SHARED
+                            </p>
                         </div>
                     </div>
                 </div>
