@@ -357,6 +357,17 @@ async def get_geodata():
         {"coordinates": [37.6173, 55.7558], "threat": "encoding", "intensity": random.randint(5,10)},
         {"coordinates": [116.4074, 39.9042], "threat": "jailbreak", "intensity": random.randint(3,8)}
     ]
+    # Add a few random ones
+    import random as rand
+    for _ in range(5):
+        points.append({
+            "coordinates": [rand.uniform(-180, 180), rand.uniform(-90, 90)],
+            "threat": rand.choice(["jailbreak", "injection", "encoding", "roleplay"]),
+            "intensity": rand.randint(1, 3)
+        })
+    return {"datapoints": points}
+
+# ---------------------------------------------------------
 
 @app.get("/api/stats")
 async def get_stats():
