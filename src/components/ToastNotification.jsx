@@ -25,3 +25,35 @@ const TOAST_ICONS = {
         </svg>
     ),
 };
+const TOAST_STYLES = {
+    success: {
+        border: 'rgba(16,185,129,0.4)',
+        bg: 'rgba(16,185,129,0.08)',
+        icon: '#10b981',
+        glow: 'rgba(16,185,129,0.15)',
+        progress: 'linear-gradient(90deg, #10b981, #34d399)',
+    },
+    error: {
+        border: 'rgba(239,68,68,0.4)',
+        bg: 'rgba(239,68,68,0.08)',
+        icon: '#ef4444',
+        glow: 'rgba(239,68,68,0.15)',
+        progress: 'linear-gradient(90deg, #ef4444, #f87171)',
+    },
+    warning: {
+        border: 'rgba(245,158,11,0.4)',
+        bg: 'rgba(245,158,11,0.08)',
+        icon: '#f59e0b',
+        glow: 'rgba(245,158,11,0.15)',
+        progress: 'linear-gradient(90deg, #f59e0b, #fbbf24)',
+    },
+    info: {
+        border: 'rgba(6,182,212,0.4)',
+        bg: 'rgba(6,182,212,0.08)',
+        icon: '#06b6d4',
+        glow: 'rgba(6,182,212,0.15)',
+        progress: 'linear-gradient(90deg, #06b6d4, #22d3ee)',
+    },
+};
+
+let toastIdCounter = 0;
