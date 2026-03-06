@@ -17,15 +17,60 @@ const CONNECTIONS = [
 ];
 
 const FAST_BLOCK_PATH = { from: 1, to: 4, label: 'FAST BLOCK' };
+
 const Particle = ({ fromX, fromY, toX, toY, color, delay = 0, duration = 0.8 }) => (
-    <motion.circle r={4} fill={color}
+    <motion.circle
+        r={4}
+        fill={color}
         initial={{ cx: fromX, cy: fromY, opacity: 0 }}
-        animate={{ cx: [fromX, toX], cy: [fromY, toY], opacity: [0, 1, 1, 0] }}
+        animate={{
+            cx: [fromX, toX],
+            cy: [fromY, toY],
+            opacity: [0, 1, 1, 0],
+        }}
         transition={{ duration, delay, ease: 'easeInOut', repeat: Infinity, repeatDelay: 2 }}
-        style={{ filter: `drop-shadow(0 0 6px ${color})` }} />
+        style={{ filter: `drop-shadow(0 0 6px ${color})` }}
+    />
 );
+
 const AttackFlowVisualizer = ({ isProcessing = false, lastResult = null }) => {
     const [activeStage, setActiveStage] = useState(-1);
     const [fastBlock, setFastBlock] = useState(false);
-    const [resultColor, setResultColor] = useState(null)
+    const [resultColor, setResultColor] = useState(null);
+
+    useEffect(() => {
+        if (!isProcessing) {
+            setActiveStage(-1);
+            return;
+        }
+        setFastBlock(false);
+        setResultColor(null);
+        const timers = [];
+        [0, 1, 2, 3, 4].forEach((stage, i) => {
+            timers.push(setTimeout(() => setActiveStage(stage), i * 500));
+        });
+        return () => timers.forEach(clearTimeout);
+    }, [isProcessing]);
+
+    useEffect(() => {
+        if (lastResult === 'blocked') {
+            setResultColor('#ef4444');
+            if (Math.random() > 0.5) setFastBlock(true);
+        } else if (lastResult === 'flagged') {
+            setResultColor('#f59e0b');
+        } else if (lastResult === 'allowed') {
+            setResultColor('#10b981');
+        }
+    }, [lastResult]);
+
+    const getStageColor = (index) => {
+        if (activeStage < 0) return STAGES[index].color;
+        if (index < activeStage) return '#10b981';
+        if (index === activeStage) return STAGES[index].color;
+        return 'rgba(255,255,255,0.15)';
+    };
+
+    const svgWidth = 740;
+    const svgHeight = 240;
+    const nodeRadius = 32
 };
