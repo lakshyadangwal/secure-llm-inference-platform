@@ -141,11 +141,17 @@ fi
 # ── Summary ───────────────────────────────────────────────────────────────────
 echo ""
 echo "═══════════════════════════════════════════════════════════════════"
-# Print final summary based on pass/fail counts
 if [[ $CHECKS_FAILED -eq 0 ]]; then
     echo -e "  ${GREEN}All $CHECKS_PASSED checks passed! System is healthy.${NC} 🛡️"
+    echo -e "  ${GREEN}Neuro-Sentry is fully operational.${NC}"
+    EXIT_CODE=0
 else
     echo -e "  ${GREEN}$CHECKS_PASSED passed${NC}, ${RED}$CHECKS_FAILED failed${NC}"
+    echo -e "  ${RED}Action required — review failed checks above.${NC}"
+    EXIT_CODE=1
 fi
 echo "═══════════════════════════════════════════════════════════════════"
 echo ""
+
+# Exit with appropriate code so CI/CD pipelines can detect failures
+exit $EXIT_CODE
