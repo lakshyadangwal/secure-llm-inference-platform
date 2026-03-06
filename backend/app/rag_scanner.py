@@ -67,4 +67,20 @@ class RAGScanner:
             "chunk_results": results
         }
 
+    def _chunk_text(self, text: str) -> List[str]:
+        """Simple arbitrary chunking for demonstration purposes."""
+        if not text:
+            return []
+            
+        chunks = []
+        start = 0
+        text_len = len(text)
+        
+        while start < text_len:
+            end = start + self.chunk_size
+            chunks.append(text[start:end])
+            start = end - self.overlap
+            
+        return chunks
+
 rag_scanner = RAGScanner()
