@@ -27,3 +27,37 @@ const generateHeatmapData = () => {
     });
     return data;
 };
+const LineChart = ({ data }) => {
+    const [progress, setProgress] = useState(0);
+    const [hoveredPoint, setHoveredPoint] = useState(null);
+    const width = 600, height = 200, padX = 45, padY = 25;
+    const chartW = width - padX * 2, chartH = height - padY * 2;
+
+    useEffect(() => {
+        let raf;
+        let start = null;
+        const animate = (ts) => {
+            if (!start) start = ts;
+            const p = Math.min(1, (ts - start) / 1200);
+            setProgress(p);
+            if (p < 1) raf = requestAnimationFrame(animate);
+        };
+        raf = requestAnimationFrame(animate);
+        return () => cancelAnimationFrame(raf);
+    }, []);
+
+    const maxVal = Math.max(...data.flatMap(d => [d.blocked, d.flagged, d.allowed]), 1);
+
+    const toPath = (key) => {
+        return data.map((d, i) => {
+            const x = padX + (i / (data.length - 1)) * chartW;
+            const y = padY + chartH - (d[key] / maxVal) * chartH;
+            return `${i === 0 ? 'M' : 'L'}${x},${y}`;
+        }).join(' ');
+    };
+
+    const lines = [
+        { key: 'blocked', color: '#10b981', label: 'Blocked' },
+        { key: 'flagged', color: '#f59e0b', label: 'Flagged' },
+        { key: 'allowed', color: '#ef4444', label: 'Allowed' },
+    ];
