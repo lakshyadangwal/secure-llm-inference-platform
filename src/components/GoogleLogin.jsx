@@ -140,6 +140,35 @@ export default function GoogleLogin({ onLoginSuccess, onLogout }) {
                 )}
             </div>
             {showDropdown && <div style={{ position: "fixed", inset: 0, zIndex: 999 }} onClick={() => setShowDropdown(false)} />}
+            {showModal && (
+                <div style={{
+                    position: "fixed", inset: 0, zIndex: 2000, background: "rgba(0,0,0,0.85)",
+                    backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center"
+                }}
+                    onClick={e => { if (e.target === e.currentTarget) setShowModal(false); }}>
+                    <div style={{
+                        width: 400, background: "#0a0f1a", border: "1px solid rgba(0,255,180,0.3)",
+                        borderRadius: 12, overflow: "hidden", boxShadow: "0 0 60px rgba(0,255,180,0.1), 0 24px 48px rgba(0,0,0,0.7)", position: "relative"
+                    }}>
+                        {/* scan line */}
+                        <div style={{
+                            position: "absolute", left: 0, right: 0, height: 2,
+                            background: "linear-gradient(90deg,transparent,rgba(0,255,180,0.6),transparent)",
+                            top: scanLine + "%", pointerEvents: "none", zIndex: 1
+                        }} />
+                        {/* Header */}
+                        <div style={{ padding: "14px 20px", background: "rgba(0,255,180,0.05)", borderBottom: "1px solid rgba(0,255,180,0.15)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                <div style={{ width: 8, height: 8, borderRadius: "50%", background: teal, boxShadow: "0 0 8px #00ffb4", animation: "pulse 2s infinite" }} />
+                                <span style={{ fontSize: 11, fontFamily: "Courier New, monospace", color: teal, fontWeight: 700, letterSpacing: "0.1em" }}>
+                                    NEURO-SENTRY // AUTH MODULE
+                                </span>
+                            </div>
+                            <button onClick={() => setShowModal(false)} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.4)", cursor: "pointer", fontSize: 18 }}>x</button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </>
     );
 }
