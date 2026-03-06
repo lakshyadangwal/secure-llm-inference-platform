@@ -2,7 +2,20 @@
 # ─── Neuro-Sentry Health Check ───────────────────────────────────────────────
 #
 # Quick diagnostic — run anytime to verify all components are working.
-# Usage: bash deploy/healthcheck.sh
+#
+# Usage:
+#   bash deploy/healthcheck.sh
+#
+# Requirements:
+#   - tailscale   : VPN mesh network client
+#   - curl        : HTTP request tool
+#   - python3     : JSON parsing from health responses
+#   - systemctl   : systemd service management
+#
+# Exit codes:
+#   0 = all checks passed
+#   1 = one or more checks failed
+#
 # ──────────────────────────────────────────────────────────────────────────────
 
 # -u: treat unset variables as errors
