@@ -23,3 +23,38 @@ class OutputDLPEngine:
         "PRIVATE_KEY": r"-----BEGIN (?:RSA |OPENSSH )?PRIVATE KEY-----",
     }
     
+    def __init__(self):
+        self.compiled_patterns = {name: re.compile(pattern) for name, pattern in self.PATTERNS.items()}
+        logger.info("🛡️  Output DLP Engine initialized with %d detection patterns.", len(self.PATTERNS))
+
+    def scan_and_redact(self, text: str) -> Tuple[str, List[str], bool]:
+        """
+        Scans provided text for sensitive data. 
+        Returns (redacted_text, list_of_detected_threats, is_leak_detected)
+        """
+        if not text:
+            return text, [], False
+
+        detected_leaks = []
+        redacted_text = text
+        is_leak = False
+
+        for threat_name, pattern in self.compiled_patterns.items():
+            matches = pattern.findall(redacted_text)
+            if matches:
+                # Add to detected list
+                detected_leaks.append(threat_name)
+                is_leak = True
+                
+                # Perform redaction
+                for match in matches:
+                    redacted_text = redacted_text.replace(match, f"[REDACTED: {threat_name}]")
+        
+        if is_leak:
+            logger.warning("🚨 [DLP] Sensitive data leak prevented! Threats detected: %s", detected_leaks)
+        else:
+            logger.info("✅ [DLP] Output scan clean. No sensitive data leaked.")
+            
+        return redacted_text, list(set(detected_leaks)), is_leak
+        
+dlp_engine = OutputDLPEngine()
