@@ -327,6 +327,15 @@ async def delete_rule(rule_id: str):
     rules_engine.delete_rule(rule_id)
     return {"status": "success"}
 
+@app.get("/api/redteam/stream")
+async def stream_fuzzer(iterations: int = 10, delay: float = 2.0):
+    async def event_generator():
+        async for status in redteam_fuzzer.start_fuzzing(iterations, delay):
+            # Send Server-Sent Events (SSE) format
+            yield f"data: {json.dumps(status)}\n\n"
+            
+    return StreamingResponse(event_generator(), media_type="text/event-stream")
+
 @app.get("/api/stats")
 async def get_stats():
     """Get current system statistics"""
