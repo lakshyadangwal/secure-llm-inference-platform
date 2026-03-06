@@ -18,4 +18,53 @@ class RAGScanner:
         self.chunk_size = chunk_size
         self.overlap = overlap
         
+    async def process_file(self, file: UploadFile, rules_eval_func) -> Dict:
+        """
+        Reads a file, chunks it, and scans each chunk.
+        """
+        logger.info(f"📄 Starting RAG Scan on uploaded file: {file.filename}")
+        
+        content = await file.read()
+        try:
+            text = content.decode('utf-8')
+        except UnicodeDecodeError:
+            return {
+                "status": "error",
+                "message": "Only UTF-8 encoded text files are supported currently."
+            }
+            
+        chunks = self._chunk_text(text)
+        logger.info(f"🔪 Document chunked into {len(chunks)} pieces.")
+        
+        results = []
+        is_poisoned = False
+        total_threats = 0
+        
+        for idx, chunk in enumerate(chunks):
+            # Evaluate using the Dynamic Rules Engine (passed in)
+            eval_result = rules_eval_func(chunk)
+            
+            chunk_summary = {
+                "chunk_id": idx + 1,
+                "text_preview": chunk[:100] + "...",
+                "is_threat": eval_result["is_threat"],
+                "matched_rule": eval_result["matched_rule_name"]
+            }
+            results.append(chunk_summary)
+            
+            if eval_result["is_threat"]:
+                is_poisoned = True
+                total_threats += 1
+                
+        logger.info(f"🏁 RAG Scan completed. Poisoned: {is_poisoned}. Threats found: {total_threats}")
+        
+        return {
+            "status": "success",
+            "filename": file.filename,
+            "total_chunks": len(chunks),
+            "is_poisoned": is_poisoned,
+            "total_threats_found": total_threats,
+            "chunk_results": results
+        }
+
 rag_scanner = RAGScanner()
