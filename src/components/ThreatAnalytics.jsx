@@ -141,3 +141,81 @@ const LineChart = ({ data }) => {
         </div>
     );
 };
+// Heatmap
+const Heatmap = ({ data }) => {
+    const [hoveredCell, setHoveredCell] = useState(null);
+    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+    const getColor = (value) => {
+        if (value < 0.2) return 'rgba(6,182,212,0.05)';
+        if (value < 0.4) return 'rgba(6,182,212,0.15)';
+        if (value < 0.6) return 'rgba(6,182,212,0.3)';
+        if (value < 0.8) return 'rgba(245,158,11,0.4)';
+        return 'rgba(239,68,68,0.5)';
+    };
+
+    return (
+        <div className="overflow-x-auto">
+            <div className="min-w-[500px]">
+                {/* Hour labels */}
+                <div className="flex ml-10 mb-1">
+                    {Array.from({ length: 24 }, (_, h) => (
+                        <div key={h} className="flex-1 text-center text-[8px] font-mono text-[var(--text-muted)]">
+                            {h % 4 === 0 ? `${String(h).padStart(2, '00')}` : ''}
+                        </div>
+                    ))}
+                </div>
+
+                {/* Grid */}
+                {days.map((day, di) => (
+                    <div key={day} className="flex items-center gap-1 mb-1">
+                        <span className="w-9 text-right text-[9px] font-mono text-[var(--text-muted)] flex-shrink-0">{day}</span>
+                        <div className="flex flex-1 gap-[2px]">
+                            {Array.from({ length: 24 }, (_, h) => {
+                                const cell = data.find(c => c.day === day && c.hour === h);
+                                const val = cell?.value || 0;
+                                const isHovered = hoveredCell?.day === day && hoveredCell?.hour === h;
+                                return (
+                                    <motion.div
+                                        key={h}
+                                        initial={{ opacity: 0, scale: 0 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        transition={{ delay: (di * 24 + h) * 0.003, duration: 0.2 }}
+                                        className="flex-1 aspect-square rounded-sm cursor-pointer transition-all"
+                                        style={{
+                                            background: getColor(val),
+                                            border: isHovered ? '1px solid rgba(6,182,212,0.5)' : '1px solid transparent',
+                                            boxShadow: isHovered ? `0 0 8px ${getColor(val)}` : 'none',
+                                            transform: isHovered ? 'scale(1.4)' : 'scale(1)',
+                                        }}
+                                        onMouseEnter={() => setHoveredCell({ day, hour: h, value: val })}
+                                        onMouseLeave={() => setHoveredCell(null)}
+                                    />
+                                );
+                            })}
+                        </div>
+                    </div>
+                ))}
+
+                {/* Heatmap tooltip */}
+                {hoveredCell && (
+                    <div className="mt-2 text-center text-xs font-mono text-[var(--text-muted)]">
+                        <span className="text-[var(--text-primary)] font-bold">{hoveredCell.day} {String(hoveredCell.hour).padStart(2, '0')}:00</span>
+                        {' — '}Intensity: <span className="font-bold" style={{ color: hoveredCell.value > 0.6 ? '#f59e0b' : '#06b6d4' }}>
+                            {Math.round(hoveredCell.value * 100)}%
+                        </span>
+                    </div>
+                )}
+
+                {/* Scale */}
+                <div className="flex items-center justify-end gap-1 mt-3">
+                    <span className="text-[8px] font-mono text-[var(--text-muted)]">Low</span>
+                    {[0.1, 0.3, 0.5, 0.7, 0.9].map(v => (
+                        <div key={v} className="w-3 h-3 rounded-sm" style={{ background: getColor(v) }} />
+                    ))}
+                    <span className="text-[8px] font-mono text-[var(--text-muted)]">High</span>
+                </div>
+            </div>
+        </div>
+    );
+};
