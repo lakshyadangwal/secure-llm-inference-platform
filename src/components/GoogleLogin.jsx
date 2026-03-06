@@ -45,4 +45,24 @@ export default function GoogleLogin({ onLoginSuccess, onLogout }) {
         const interval = setInterval(() => setScanLine(p => (p + 1) % 100), 30);
         return () => clearInterval(interval);
     }, []);
+
+    function handleCredentialResponse(response) {
+        const payload = JSON.parse(atob(response.credential.split(".")[1]));
+        const userData = { name: payload.name, email: payload.email, picture: payload.picture };
+        setUser(userData);
+        sessionStorage.setItem("ns_google_user", JSON.stringify(userData));
+        sessionStorage.setItem("ns_google_credential", response.credential);
+        setShowModal(false);
+        onLoginSuccess?.(userData);
+    }
+
+    function logout() {
+        sessionStorage.removeItem("ns_google_user");
+        sessionStorage.removeItem("ns_google_credential");
+        setUser(null); setShowDropdown(false);
+        window.google?.accounts?.id?.disableAutoSelect();
+        onLogout?.();
+    }
+
+    const teal = "#00ffb4";
 }
