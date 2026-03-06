@@ -53,4 +53,59 @@ class RedTeamFuzzer:
         noise = ''.join(random.choices(' \t\n', k=random.randint(0, 3)))
         return f"{base_prompt}{noise}"
 
+    async def start_fuzzing(self, max_iterations: int = 10, delay_seconds: float = 2.0) -> AsyncGenerator[dict, None]:
+        """
+        Starts an asynchronous fuzzing loop. Yields status updates.
+        """
+        self.is_running = True
+        self.current_job_id = f"job_{int(time.time())}"
+        self.stats = {"attempts": 0, "successes": 0, "failures": 0, "errors": 0}
+        
+        logger.info(f"🚀 Started Red Team Fuzzer ({self.current_job_id}) for {max_iterations} iterations.")
+        
+        for i in range(max_iterations):
+            if not self.is_running:
+                logger.info("🛑 Fuzzing stopped manually.")
+                break
+                
+            strategy = random.choice(self.ATTACK_STRATEGIES)
+            prompt = self._generate_attack_prompt(strategy)
+            
+            self.stats["attempts"] += 1
+            
+            yield {
+                "iteration": i + 1,
+                "status": "generating",
+                "strategy": strategy,
+                "prompt": prompt,
+                "timestamp": time.time(),
+                "stats": self.stats
+            }
+            
+            # Simulate latency in generating prompt
+            await asyncio.sleep(0.5)
+            
+            # Here we WOULD call analyze_prompt from main.py, but to avoid circular imports 
+            # in this module structure, we'll yield the prompt and let the endpoint handle the evaluation
+            yield {
+                "iteration": i + 1,
+                "status": "ready_for_eval",
+                "strategy": strategy,
+                "prompt": prompt,
+                "timestamp": time.time(),
+                "stats": self.stats
+            }
+            
+            await asyncio.sleep(delay_seconds)
+            
+        self.is_running = False
+        logger.info(f"🏁 Fuzzing job completed.")
+        yield {
+            "status": "completed",
+            "stats": self.stats
+        }
+
+    def stop(self):
+        self.is_running = False
+
 redteam_fuzzer = RedTeamFuzzer()
