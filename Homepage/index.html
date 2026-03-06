@@ -15,7 +15,7 @@
   --dim:     rgba(0,229,255,0.08);
   --border:  rgba(0,229,255,0.18);
   --bg:      #020609;
-  --text:    #c8eaf0;
+  --text:    #e8f4f8;
   --nav-bg:  rgba(2,6,9,0.7);
   --card-bg: var(--bg);
   --section-bg: rgba(0,229,255,0.02);
@@ -26,7 +26,7 @@
 
 html.light {
   --bg:      #f0f4f8;
-  --text:    #0f172a;
+  --text:    #0a0f1a;
   --dim:     rgba(0,150,180,0.08);
   --border:  rgba(0,150,180,0.25);
   --nav-bg:  rgba(240,244,248,0.85);
@@ -40,7 +40,7 @@ html.light {
 /* light mode overrides */
 html.light body { background: #f0f4f8; color: #0f172a; }
 html.light nav { background: rgba(240,244,248,0.9); border-color: rgba(0,150,180,0.2); }
-html.light .nav-links a { color: rgba(15,23,42,0.5); }
+html.light .nav-links a { color: rgba(15,23,42,0.75); }
 html.light .nav-links a:hover { color: #0099bb; }
 html.light .nav-logo { color: #0099bb; }
 html.light .nav-logo-icon { border-color: #0099bb; }
@@ -48,22 +48,22 @@ html.light .nav-logo-icon::before { color: #0099bb; }
 html.light .nav-cta { border-color: #0099bb; color: #0099bb; }
 html.light .nav-cta:hover { background: #0099bb; color: #fff; }
 html.light .hero-title-line1 { color: #0f172a; text-shadow: 0 0 40px rgba(0,150,180,0.3); }
-html.light .hero-sub { color: rgba(15,23,42,0.6); }
+html.light .hero-sub { color: #1e293b; }
 html.light .hero-sub span { color: #0099bb; }
 html.light .btn-secondary { color: #0f172a; border-color: rgba(0,150,180,0.3); }
 html.light .btn-secondary:hover { color: #0099bb; border-color: #0099bb; }
 html.light .hero-stats { border-color: rgba(0,150,180,0.2); }
 html.light .stat-num { color: #0099bb; }
-html.light .stat-label { color: rgba(15,23,42,0.4); }
+html.light .stat-label { color: #334155; }
 html.light .section-label { color: #0099bb; }
 html.light .section-label::before { background: #0099bb; }
 html.light .section-title { color: #0f172a; }
-html.light .section-desc { color: rgba(15,23,42,0.55); }
+html.light .section-desc { color: #1e293b; }
 html.light .features-grid { background: rgba(0,150,180,0.15); border-color: rgba(0,150,180,0.15); }
 html.light .feature-card { background: rgba(255,255,255,0.95); }
 html.light .feature-card:hover { background: rgba(255,255,255,1); }
 html.light .feature-title { color: #0f172a; }
-html.light .feature-desc { color: rgba(15,23,42,0.55); }
+html.light .feature-desc { color: #1e293b; }
 html.light .feature-num { color: rgba(0,150,180,0.3); }
 html.light .feature-icon { background: rgba(0,150,180,0.08); border-color: rgba(0,150,180,0.2); }
 html.light .attacks-section { background: rgba(0,150,180,0.03); border-color: rgba(0,150,180,0.15); }
@@ -72,22 +72,22 @@ html.light .attack-row { background: rgba(255,255,255,0.95); }
 html.light .attack-row:hover { background: rgba(240,248,255,1); }
 html.light .attack-row-num { color: rgba(0,150,180,0.35); }
 html.light .attack-row-name { color: #0f172a; }
-html.light .attack-row-desc { color: rgba(15,23,42,0.45); }
+html.light .attack-row-desc { color: #1e293b; }
 html.light .how-step-title { color: #0f172a; }
-html.light .how-step-desc { color: rgba(15,23,42,0.5); }
+html.light .how-step-desc { color: #1e293b; }
 html.light .how-step-circle { background: #f0f4f8; color: #0099bb; border-color: #0099bb; }
 html.light .how-step:hover .how-step-circle { background: #0099bb; color: #fff; }
 html.light .how-grid::before { background: linear-gradient(90deg, transparent, rgba(0,150,180,0.2), #0099bb, rgba(0,150,180,0.2), transparent); }
 html.light .terminal { background: #1a2332; border-color: rgba(0,150,180,0.25); }
 html.light .terminal-bar { background: rgba(0,150,180,0.1); border-color: rgba(0,150,180,0.2); }
 html.light .cta-title { color: #0f172a; }
-html.light .cta-sub { color: rgba(15,23,42,0.55); }
+html.light .cta-sub { color: #1e293b; }
 html.light .cta-box { background: rgba(0,150,180,0.06); border-color: rgba(0,150,180,0.2); }
 html.light .team-card { background: rgba(255,255,255,0.9); border-color: rgba(0,150,180,0.2); }
 html.light .team-card:hover { background: #fff; border-color: rgba(0,150,180,0.4); }
 html.light .team-name { color: #0f172a; }
-html.light .team-roll { color: rgba(15,23,42,0.35); }
-html.light footer { border-color: rgba(0,150,180,0.15); color: rgba(15,23,42,0.3); }
+html.light .team-roll { color: #334155; }
+html.light footer { border-color: rgba(0,150,180,0.15); color: rgba(15,23,42,0.6); }
 html.light .scroll-hint { color: rgba(15,23,42,0.3); }
 html.light body::after { background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px); }
 
@@ -119,6 +119,7 @@ body {
   color: var(--text);
   overflow-x: hidden;
   cursor: crosshair;
+  font-weight: 500;
 }
 
 /* ── CANVAS BACKGROUND ── */
@@ -198,7 +199,7 @@ nav {
 .nav-links a {
   font-family: 'Share Tech Mono', monospace;
   font-size: 0.75rem;
-  color: rgba(200,234,240,0.5);
+  color: #e8f4ff;
   text-decoration: none;
   letter-spacing: 0.15em;
   text-transform: uppercase;
@@ -298,8 +299,8 @@ nav {
 
 .hero-sub {
   font-size: 1.2rem;
-  font-weight: 300;
-  color: rgba(200,234,240,0.6);
+  font-weight: 500;
+  color: #eef6ff;
   max-width: 580px;
   line-height: 1.7;
   margin-bottom: 3rem;
@@ -391,7 +392,7 @@ nav {
   font-family: 'Share Tech Mono', monospace;
   font-size: 0.65rem;
   letter-spacing: 0.15em;
-  color: rgba(200,234,240,0.4);
+  color: #ddeeff;
   text-transform: uppercase;
   margin-top: 0.4rem;
   display: block;
@@ -410,7 +411,7 @@ nav {
   font-family: 'Share Tech Mono', monospace;
   font-size: 0.6rem;
   letter-spacing: 0.2em;
-  color: rgba(200,234,240,0.3);
+  color: #cce4f5;
   animation: fadeSlideDown 1s 1s ease both;
 }
 .scroll-line {
@@ -456,7 +457,7 @@ section {
 }
 .section-desc {
   font-size: 1.05rem;
-  color: rgba(200,234,240,0.55);
+  color: #e8f4ff;
   max-width: 540px;
   line-height: 1.7;
 }
@@ -527,7 +528,7 @@ section {
 
 .feature-desc {
   font-size: 0.95rem;
-  color: rgba(200,234,240,0.5);
+  color: #e8f4ff;
   line-height: 1.7;
 }
 
@@ -583,7 +584,7 @@ section {
 }
 .attack-row-desc {
   font-size: 0.85rem;
-  color: rgba(200,234,240,0.4);
+  color: #ddeeff;
 }
 
 .attack-tag {
@@ -610,7 +611,7 @@ section {
 .attack-rate-label {
   font-family: 'Share Tech Mono', monospace;
   font-size: 0.6rem;
-  color: rgba(200,234,240,0.3);
+  color: #cce4f5;
   letter-spacing: 0.1em;
 }
 .rate-high   { color: #ff2d55; }
@@ -670,7 +671,7 @@ section {
 }
 .how-step-desc {
   font-size: 0.9rem;
-  color: rgba(200,234,240,0.45);
+  color: #e4f2ff;
   line-height: 1.6;
 }
 
@@ -710,7 +711,7 @@ section {
 .terminal-title {
   font-family: 'Share Tech Mono', monospace;
   font-size: 0.7rem;
-  color: rgba(200,234,240,0.35);
+  color: #d5eaf8;
   letter-spacing: 0.15em;
 }
 
@@ -721,16 +722,16 @@ section {
   line-height: 2;
 }
 .t-line { display: flex; gap: 0.8rem; opacity: 0; }
-.t-time { color: rgba(200,234,240,0.2); min-width: 80px; }
+.t-time { color: #bbd8ee; min-width: 80px; }
 .t-tag  { min-width: 60px; }
-.t-msg  { color: rgba(200,234,240,0.7); }
+.t-msg  { color: #f0f8ff; }
 
 .t-system { color: #00ff88; }
 .t-exec   { color: #00e5ff; }
 .t-warn   { color: #ffa500; }
 .t-err    { color: #ff2d55; }
 .t-sec    { color: #00ff88; }
-.t-info   { color: rgba(200,234,240,0.5); }
+.t-info   { color: #e8f4ff; }
 
 .t-cursor {
   display: inline-block;
@@ -803,7 +804,7 @@ section {
 }
 .cta-sub {
   font-size: 1.1rem;
-  color: rgba(200,234,240,0.5);
+  color: #e8f4ff;
   margin-bottom: 3rem;
   max-width: 480px;
   margin-left: auto;
@@ -834,7 +835,7 @@ section {
 .cta-cmd {
   font-family: 'Share Tech Mono', monospace;
   font-size: 0.85rem;
-  color: rgba(200,234,240,0.4);
+  color: #ddeeff;
   letter-spacing: 0.1em;
 }
 .cta-cmd span { color: var(--green); }
@@ -849,7 +850,7 @@ footer {
   font-family: 'Share Tech Mono', monospace;
   font-size: 0.65rem;
   letter-spacing: 0.12em;
-  color: rgba(200,234,240,0.25);
+  color: #c8e2f5;
   text-transform: uppercase;
 }
 .footer-status {
@@ -959,7 +960,7 @@ footer {
   font-family: 'Share Tech Mono', monospace;
   font-size: 0.7rem;
   letter-spacing: 0.12em;
-  color: rgba(200,234,240,0.3);
+  color: #cce4f5;
   margin-bottom: 1rem;
 }
 
