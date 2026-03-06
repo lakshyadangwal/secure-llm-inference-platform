@@ -1,7 +1,14 @@
 """
-Neuro-Sentry Defense Backend
-FastAPI server for LLM security testing with Ollama integration
-Enhanced with auto-detection, logging, and configuration
+Neuro-Sentry Defense Backend — main.py (refactored)
+Ties together all routers, middleware, and lifecycle hooks.
+
+Commits assembled here:
+  16: split into routers
+  10/11: rotating + JSON logging
+  18: settings from env
+  20: startup warm-up
+  21: shutdown stats dump
+   2: rate limiting middleware
 """
 
 from fastapi import FastAPI, HTTPException, Depends, Header as FastAPIHeader
@@ -9,8 +16,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import subprocess
 import json
-import time
 import os
+import time
 import logging
 import random
 from datetime import datetime
@@ -40,52 +47,18 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Detect available Ollama models
-def detect_ollama_model():
-    """Auto-detect which Ollama model to use"""
-    try:
-        result = subprocess.run(
-            ["ollama", "list"],
-            capture_output=True,
-            text=True,
-            timeout=5
-        )
-        
-        models_output = result.stdout
-        logger.info(f"Ollama models detected:\n{models_output}")
-        
-        # Priority: llama3-gpu > llama3 > mistral > first available
-        if "llama3-gpu" in models_output:
-            logger.info("✓ Using llama3-gpu (GPU accelerated)")
-            return "llama3-gpu"
-        elif "llama3" in models_output:
-            logger.info("✓ Using llama3")
-            return "llama3"
-        elif "mistral" in models_output:
-            logger.info("✓ Using mistral (fallback)")
-            return "mistral"
-        else:
-            # Get first model name
-            lines = models_output.split('\n')[1:]  # Skip header
-            for line in lines:
-                if line.strip():
-                    model_name = line.split()[0]
-                    logger.info(f"✓ Using first available model: {model_name}")
-                    return model_name
-            
-            logger.error("❌ No Ollama models found!")
-            return None
-    except Exception as e:
-        logger.error(f"❌ Error detecting Ollama models: {e}")
-        return None
+from app.config.settings import settings
+from app.services.logging_setup import setup_logging
+from app.services.ollama_service import ollama_service
+from app.services.stats_store import get_stats
+from app.middleware.rate_limiter import RateLimitMiddleware
 
-# Get the model to use
-OLLAMA_MODEL = detect_ollama_model()
-if not OLLAMA_MODEL:
-    logger.warning("⚠️  Ollama model not detected. Backend will start but LLM calls will fail.")
-    OLLAMA_MODEL = "llama3"  # Fallback
+# Import all routers
+from app.routes import chat, prompt, stats, health, test_attack
 
-logger.info(f"🤖 Selected model: {OLLAMA_MODEL}")
+# ── Initialise logging first ───────────────────────────────────────────
+log_file = setup_logging()
+logger = logging.getLogger(__name__)
 
 # Google OAuth Client ID (must match frontend)
 GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "YOUR_GOOGLE_CLIENT_ID")
@@ -109,30 +82,27 @@ async def verify_google_token(authorization: Optional[str] = FastAPIHeader(None)
 
 app = FastAPI(
     title="Neuro-Sentry Defense API",
-    description="Backend API for LLM security testing",
-    version="2.0.0"
+    description="Backend API for LLM security testing with multi-layer defense pipeline",
+    version="3.0.0",
 )
 
-# CORS Configuration
+# ── Middleware ─────────────────────────────────────────────────────────
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=settings.CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.add_middleware(RateLimitMiddleware)
 
-# Stats storage (in-memory)
-stats = {
-    "total_attempts": 0,
-    "total_blocked": 0,
-    "total_leaked": 0,
-    "block_rate": 100.0,
-}
+# ── Register routers ───────────────────────────────────────────────────
+app.include_router(health.router)
+app.include_router(chat.router)
+app.include_router(prompt.router)
+app.include_router(stats.router)
+app.include_router(test_attack.router)
 
-# Request Models
-class ChatRequest(BaseModel):
-    prompt: str
 
 class PromptRequest(BaseModel):
     prompt: str
@@ -184,24 +154,17 @@ def check_for_threats(prompt: str) -> dict:
 
 @app.on_event("startup")
 async def startup_event():
-    """Log startup information"""
     logger.info("=" * 60)
-    logger.info("🛡️  NEURO-SENTRY DEFENSE BACKEND STARTING")
+    logger.info("🛡️  NEURO-SENTRY DEFENSE BACKEND v3.0 STARTING")
     logger.info("=" * 60)
-    logger.info(f"🤖 Ollama Model: {OLLAMA_MODEL}")
-    logger.info(f"📝 Log file: {log_file}")
-    logger.info(f"🌐 CORS: Enabled for all origins")
+    logger.info(f"🤖 Ollama Model : {ollama_service.model}")
+    logger.info(f"📝 Log file     : {log_file}")
+    logger.info(f"🌐 CORS origins : {settings.CORS_ORIGINS}")
+    logger.info(f"🔒 Rate limit   : {settings.RATE_LIMIT_PER_MINUTE} req/min")
     logger.info("=" * 60)
+    # Commit 20: warm up the model
+    ollama_service.warm_up()
 
-@app.get("/")
-async def root():
-    """Root endpoint"""
-    return {
-        "service": "Neuro-Sentry Defense API",
-        "version": "2.0.0",
-        "status": "online",
-        "model": OLLAMA_MODEL
-    }
 
 @app.get("/health")
 async def health():
@@ -227,29 +190,11 @@ async def health():
 @app.post("/chat")
 async def chat(request: ChatRequest, user_info: dict = Depends(verify_google_token)):
     """
-    Direct chat endpoint - sends prompt to Ollama
-    Used by Direct Neural Link tab
+    Commit 21: On shutdown dump final statistics to a JSON file in logs/.
     """
-    logger.info(f"💬 Chat request received")
-    
-    try:
-        # Call Ollama
-        response_text = call_ollama(request.prompt)
-        
-        logger.info(f"✅ Chat response sent successfully")
-        
-        return {
-            "response": response_text,
-            "status": "success",
-            "model": OLLAMA_MODEL,
-            "timestamp": time.time()
-        }
-    except Exception as e:
-        logger.error(f"❌ Chat error: {str(e)}")
-        raise HTTPException(
-            status_code=500,
-            detail=f"LLM Error: {str(e)}"
-        )
+    if settings.STATS_DUMP_ON_SHUTDOWN:
+        final_stats = get_stats()
+        final_stats["shutdown_at"] = time.time()
 
 @app.post("/api/prompt")
 async def analyze_prompt(request: PromptRequest, user_info: dict = Depends(verify_google_token)):
@@ -405,21 +350,13 @@ async def get_stats():
         "model": OLLAMA_MODEL,
     }
 
-@app.get("/api/logs")
-async def get_logs(limit: int = 50):
-    """Get recent system logs"""
-    try:
-        if os.path.exists(log_file):
-            with open(log_file, 'r') as f:
-                lines = f.readlines()
-                recent_logs = lines[-limit:]
-                return {"logs": [line.strip() for line in recent_logs]}
-        else:
-            return {"logs": ["No logs available yet"]}
-    except Exception as e:
-        return {"logs": [f"Error reading logs: {str(e)}"]}
 
+# ── Dev entry point ────────────────────────────────────────────────────
 if __name__ == "__main__":
     import uvicorn
-    logger.info("🚀 Starting Uvicorn server...")
-    uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run(
+        "app.main:app",
+        host=settings.API_HOST,
+        port=settings.API_PORT,
+        reload=True,
+    )
