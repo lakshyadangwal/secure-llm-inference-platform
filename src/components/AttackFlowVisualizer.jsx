@@ -17,3 +17,15 @@ const CONNECTIONS = [
 ];
 
 const FAST_BLOCK_PATH = { from: 1, to: 4, label: 'FAST BLOCK' };
+const Particle = ({ fromX, fromY, toX, toY, color, delay = 0, duration = 0.8 }) => (
+    <motion.circle r={4} fill={color}
+        initial={{ cx: fromX, cy: fromY, opacity: 0 }}
+        animate={{ cx: [fromX, toX], cy: [fromY, toY], opacity: [0, 1, 1, 0] }}
+        transition={{ duration, delay, ease: 'easeInOut', repeat: Infinity, repeatDelay: 2 }}
+        style={{ filter: `drop-shadow(0 0 6px ${color})` }} />
+);
+const AttackFlowVisualizer = ({ isProcessing = false, lastResult = null }) => {
+    const [activeStage, setActiveStage] = useState(-1);
+    const [fastBlock, setFastBlock] = useState(false);
+    const [resultColor, setResultColor] = useState(null)
+};
