@@ -73,8 +73,11 @@ if systemctl is-active --quiet neuro-sentry 2>/dev/null; then
 else
     fail "neuro-sentry.service is not running"
     ((CHECKS_FAILED++))
-    warn "Start with: sudo systemctl start neuro-sentry"
-    warn "Check logs: journalctl -u neuro-sentry -n 20 --no-pager"
+    warn "Start with  : sudo systemctl start neuro-sentry"
+    warn "Enable boot : sudo systemctl enable neuro-sentry"
+    warn "Check logs  : journalctl -u neuro-sentry -n 20 --no-pager"
+    warn "Check config: cat /etc/systemd/system/neuro-sentry.service"
+    warn "Reload daemon: sudo systemctl daemon-reload"
 fi
 
 # ── Backend health (local) ───────────────────────────────────────────────────
@@ -112,7 +115,9 @@ if echo "$SERVE_STATUS" | grep -q "8443" 2>/dev/null; then
 else
     fail "Funnel not configured on port 8443"
     ((CHECKS_FAILED++))
-    warn "Set up with: sudo tailscale funnel --https=8443 --bg http://localhost:8000"
+    warn "Set up funnel : sudo tailscale funnel --https=8443 --bg http://localhost:8000"
+    warn "Check status  : tailscale serve status"
+    warn "Reset funnel  : sudo tailscale funnel reset"
 fi
 
 # ── External HTTPS (via Tailscale Funnel on port 8443) ────────────────────────
