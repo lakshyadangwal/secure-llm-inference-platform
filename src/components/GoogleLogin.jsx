@@ -103,7 +103,43 @@ export default function GoogleLogin({ onLoginSuccess, onLogout }) {
                         <span style={{ color: "rgba(0,255,180,0.5)", fontSize: 10 }}>v</span>
                     </button>
                 )}
+                {showDropdown && user && (
+                    <div style={{
+                        position: "absolute", top: "calc(100% + 8px)", right: 0, width: 240,
+                        background: "#0a0f1a", border: "1px solid rgba(0,255,180,0.3)", borderRadius: 8,
+                        overflow: "hidden", boxShadow: "0 8px 32px rgba(0,0,0,0.6)", zIndex: 1000
+                    }}>
+                        <div style={{ padding: "14px 16px", background: "rgba(0,255,180,0.05)", borderBottom: "1px solid rgba(0,255,180,0.15)" }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                                {user.picture
+                                    ? <img src={user.picture} alt="" style={{ width: 36, height: 36, borderRadius: "50%", border: "2px solid #00ffb4" }} />
+                                    : <div style={{ width: 36, height: 36, borderRadius: "50%", background: "linear-gradient(135deg,#00ffb4,#0ea5e9)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: 700, color: "#0a0f1a" }}>{user.name.charAt(0)}</div>
+                                }
+                                <div>
+                                    <div style={{ fontSize: 13, fontWeight: 700, color: "#e2f8f0", fontFamily: "Courier New, monospace" }}>{user.name}</div>
+                                    <div style={{ fontSize: 10, color: "rgba(0,255,180,0.6)" }}>{user.email}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style={{ padding: "10px 16px", borderBottom: "1px solid rgba(255,255,255,0.05)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                            <span style={{ fontSize: 10, color: "rgba(255,255,255,0.4)", fontFamily: "monospace", textTransform: "uppercase" }}>Access Level</span>
+                            <span style={{ fontSize: 10, fontWeight: 700, color: teal, background: "rgba(0,255,180,0.1)", padding: "2px 8px", borderRadius: 4, fontFamily: "monospace" }}>OPERATOR</span>
+                        </div>
+                        <button onClick={logout}
+                            style={{
+                                width: "100%", padding: "11px 16px", background: "transparent", border: "none",
+                                display: "flex", alignItems: "center", gap: 8, color: "rgba(255,80,80,0.8)",
+                                fontSize: 12, fontFamily: "Courier New, monospace", cursor: "pointer"
+                            }}
+                            onMouseEnter={e => e.currentTarget.style.background = "rgba(255,80,80,0.08)"}
+                            onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+                        >
+                            &#x23FB; TERMINATE SESSION
+                        </button>
+                    </div>
+                )}
             </div>
+            {showDropdown && <div style={{ position: "fixed", inset: 0, zIndex: 999 }} onClick={() => setShowDropdown(false)} />}
         </>
     );
 }
