@@ -72,5 +72,49 @@ const AttackFlowVisualizer = ({ isProcessing = false, lastResult = null }) => {
 
     const svgWidth = 740;
     const svgHeight = 240;
-    const nodeRadius = 32
-};
+    const nodeRadius = 32;
+
+    return (
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="bg-[var(--card-bg)] backdrop-blur-xl rounded-2xl p-6 border border-[var(--border-primary)] overflow-hidden relative"
+        >
+            <div className="absolute inset-0 opacity-30"
+                style={{
+                    backgroundImage: 'radial-gradient(circle, var(--border-primary) 1px, transparent 1px)',
+                    backgroundSize: '20px 20px',
+                }}
+            />
+            <div className="relative z-10">
+                <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-indigo-500/15 border border-indigo-500/25 flex items-center justify-center">
+                            <svg className="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 className="text-lg font-bold text-[var(--text-primary)]">Defense Pipeline</h3>
+                            <p className="text-xs text-[var(--text-muted)] font-mono">3-stage threat analysis flow</p>
+                        </div>
+                    </div>
+                    <AnimatePresence mode="wait">
+                        {isProcessing ? (
+                            <motion.div key="processing" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }}
+                                className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-blue-500/10 border border-blue-500/30">
+                                <motion.div className="w-2 h-2 rounded-full bg-blue-400"
+                                    animate={{ scale: [1, 1.5, 1], opacity: [1, 0.5, 1] }}
+                                    transition={{ duration: 1, repeat: Infinity }} />
+                                <span className="text-[10px] font-mono font-bold text-blue-400 tracking-wider">ANALYZING</span>
+                            </motion.div>
+                        ) : (
+                            <motion.div key="idle" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }}
+                                className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[var(--card-bg)] border border-[var(--border-primary)]">
+                                <div className="w-2 h-2 rounded-full bg-emerald-400" />
+                                <span className="text-[10px] font-mono font-bold text-[var(--text-muted)] tracking-wider">READY</span>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </div> 
