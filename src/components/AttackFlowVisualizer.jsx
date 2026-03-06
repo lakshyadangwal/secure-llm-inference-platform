@@ -165,3 +165,15 @@ const AttackFlowVisualizer = ({ isProcessing = false, lastResult = null }) => {
                             </g>
                         );
                     })}
+                    {fastBlock && <g> <motion.path /* red arc */ /> <motion.text>⚡ FAST BLOCK</motion.text> </g>}
+                    {STAGES.map((stage, i) => (
+                        <g>
+                            {isActive && <motion.circle /* pulsing glow ring */ />}
+                            <motion.circle /* node body */ />
+                            <svg /* icon */ /> <text /* label */ /> <text /* sublabel */ />
+                            {isPassed && <motion.g /* ✓ checkmark */ />}
+                        </g>
+                    ))}
+                </svg></div></motion.div>);
+};
+export default AttackFlowVisualizer;
