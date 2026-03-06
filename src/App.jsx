@@ -9,6 +9,10 @@ import AttackLab from './components/AttackLab';
 import DirectChat from './components/DirectChat';
 import ConsolePanel from './components/ConsolePanel';
 import NetworkPanel from './components/NetworkPanel';
+import RuleBuilder from './components/RuleBuilder';
+import RedTeamFuzzer from './components/RedTeamFuzzer';
+import ThreatMap from './components/ThreatMap';
+import RagScanner from './components/RagScanner';
 import { attackScenarios } from './data/attackScenarios';
 import { sendPrompt, getSystemStats } from './services/api';
 
@@ -159,12 +163,16 @@ function AppInner() {
 
         <main className="flex-1 flex flex-col overflow-hidden">
           {/* Tab bar */}
-          <div className="flex items-center gap-4 px-8 py-4 border-b border-[var(--border-primary)] bg-[var(--card-bg)]">
-            {['dashboard', 'lab', 'chat'].map((view) => {
+          <div className="flex flex-wrap items-center gap-2 px-8 py-4 border-b border-[var(--border-primary)] bg-[var(--card-bg)]">
+            {['dashboard', 'map', 'rules', 'fuzzer', 'rag', 'lab', 'chat'].map((view) => {
               const labels = {
-                dashboard: 'Command Center',
+                dashboard: 'Overview',
+                map: 'Threat Map',
+                rules: 'Rule Engine',
+                fuzzer: 'Auto Fuzzer',
+                rag: 'RAG Scanner',
                 lab: 'Attack Lab',
-                chat: 'Direct Neural Link',
+                chat: 'Neural Link',
               };
               const icons = {
                 dashboard: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />,
@@ -200,6 +208,14 @@ function AppInner() {
             <AnimatePresence mode="wait">
               {activeView === 'dashboard' ? (
                 <Dashboard key="dashboard" isDefending={isDefending} isProcessing={isProcessing} isBreached={isBreached} stats={stats} />
+              ) : activeView === 'map' ? (
+                <ThreatMap key="map" />
+              ) : activeView === 'rules' ? (
+                <RuleBuilder key="rules" />
+              ) : activeView === 'fuzzer' ? (
+                <RedTeamFuzzer key="fuzzer" />
+              ) : activeView === 'rag' ? (
+                <RagScanner key="rag" />
               ) : activeView === 'chat' ? (
                 user ? (
                   <DirectChat key="chat" backendConnected={backendConnected} />
