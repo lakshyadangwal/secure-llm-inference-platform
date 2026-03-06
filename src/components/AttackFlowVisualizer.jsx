@@ -117,4 +117,51 @@ const AttackFlowVisualizer = ({ isProcessing = false, lastResult = null }) => {
                             </motion.div>
                         )}
                     </AnimatePresence>
-                </div> 
+                </div>
+
+                <svg viewBox={`0 0 ${svgWidth} ${svgHeight}`} className="w-full h-auto" style={{ minHeight: '160px' }}>
+                    <defs>
+                        <filter id="glow">
+                            <feGaussianBlur stdDeviation="3" result="blur" />
+                            <feMerge>
+                                <feMergeNode in="blur" />
+                                <feMergeNode in="SourceGraphic" />
+                            </feMerge>
+                        </filter>
+                        <linearGradient id="flowGrad" x1="0" y1="0" x2="1" y2="0">
+                            <stop offset="0%" stopColor="#06b6d4" stopOpacity={0.2} />
+                            <stop offset="50%" stopColor="#06b6d4" stopOpacity={0.8} />
+                            <stop offset="100%" stopColor="#06b6d4" stopOpacity={0.2} />
+                        </linearGradient>
+                    </defs>
+
+                    {CONNECTIONS.map((conn, i) => {
+                        const from = STAGES[conn.from];
+                        const to = STAGES[conn.to];
+                        const active = activeStage > conn.from;
+                        return (
+                            <g key={`conn-${i}`}>
+                                <line
+                                    x1={from.x + nodeRadius + 4} y1={from.y}
+                                    x2={to.x - nodeRadius - 4} y2={to.y}
+                                    stroke="var(--border-primary)" strokeWidth={2} strokeDasharray="6 4" opacity={0.3}
+                                />
+                                <motion.line
+                                    x1={from.x + nodeRadius + 4} y1={from.y}
+                                    x2={to.x - nodeRadius - 4} y2={to.y}
+                                    stroke={active ? '#10b981' : 'transparent'}
+                                    strokeWidth={2}
+                                    initial={{ pathLength: 0 }}
+                                    animate={{ pathLength: active ? 1 : 0 }}
+                                    style={{ filter: active ? 'drop-shadow(0 0 4px #10b98180)' : 'none' }}
+                                />
+                                {isProcessing && activeStage >= conn.from && (
+                                    <Particle
+                                        fromX={from.x + nodeRadius + 4} fromY={from.y}
+                                        toX={to.x - nodeRadius - 4} toY={to.y}
+                                        color="#06b6d4" delay={i * 0.3} duration={0.6}
+                                    />
+                                )}
+                            </g>
+                        );
+                    })}
