@@ -9,6 +9,10 @@ import AttackLab from './components/AttackLab';
 import DirectChat from './components/DirectChat';
 import ConsolePanel from './components/ConsolePanel';
 import NetworkPanel from './components/NetworkPanel';
+import RuleBuilder from './components/RuleBuilder';
+import RedTeamFuzzer from './components/RedTeamFuzzer';
+import ThreatMap from './components/ThreatMap';
+import RagScanner from './components/RagScanner';
 import { attackScenarios } from './data/attackScenarios';
 import { sendPrompt, getSystemStats } from './services/api';
 
@@ -22,8 +26,8 @@ function AppInner() {
   const [backendConnected, setBackendConnected] = useState(false);
   const [logs, setLogs] = useState([
     { time: new Date().toLocaleTimeString(), type: 'SYSTEM', message: 'Sovereign Matrix OS initialized.' },
-    { time: new Date().toLocaleTimeString(), type: 'INERA',  message: 'Neural bus established.' },
-    { time: new Date().toLocaleTimeString(), type: 'SEC',    message: 'Defense gate operational.' },
+    { time: new Date().toLocaleTimeString(), type: 'INERA', message: 'Neural bus established.' },
+    { time: new Date().toLocaleTimeString(), type: 'SEC', message: 'Defense gate operational.' },
   ]);
   const [stats, setStats] = useState({
     totalAttempts: 0,
@@ -153,27 +157,34 @@ function AppInner() {
 
         <main className="flex-1 flex flex-col overflow-hidden">
           {/* Tab bar */}
-          <div className="flex items-center gap-4 px-8 py-4 border-b border-[var(--border-primary)] bg-[var(--card-bg)]">
-            {['dashboard', 'lab', 'chat'].map((view) => {
+          <div className="flex flex-wrap items-center gap-2 px-8 py-4 border-b border-[var(--border-primary)] bg-[var(--card-bg)]">
+            {['dashboard', 'map', 'rules', 'fuzzer', 'rag', 'lab', 'chat'].map((view) => {
               const labels = {
-                dashboard: 'Command Center',
+                dashboard: 'Overview',
+                map: 'Threat Map',
+                rules: 'Rule Engine',
+                fuzzer: 'Auto Fuzzer',
+                rag: 'RAG Scanner',
                 lab: 'Attack Lab',
-                chat: 'Direct Neural Link',
+                chat: 'Neural Link',
               };
               const icons = {
                 dashboard: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />,
-                lab:       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />,
-                chat:      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />,
+                map: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />,
+                rules: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />,
+                fuzzer: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />,
+                rag: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />,
+                lab: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />,
+                chat: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />,
               };
               return (
                 <button
                   key={view}
                   onClick={() => setActiveView(view)}
-                  className={`px-4 py-2 rounded-xl flex items-center gap-2 text-xs font-bold uppercase tracking-widest transition-all ${
-                    activeView === view
-                      ? 'bg-[var(--card-bg-hover)] text-[var(--text-primary)]'
-                      : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
-                  }`}
+                  className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest transition-all ${activeView === view
+                      ? 'bg-[var(--card-bg-hover)] text-ns-blue border border-[var(--border-primary)] shadow-[0_0_10px_rgba(59,130,246,0.3)]'
+                      : 'text-[var(--text-muted)] hover:text-[var(--text-primary)] border border-transparent'
+                    }`}
                 >
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     {icons[view]}
@@ -185,10 +196,18 @@ function AppInner() {
           </div>
 
           {/* Active view */}
-          <div className="flex-1 overflow-hidden">
+          <div className="flex-1 overflow-auto p-8">
             <AnimatePresence mode="wait">
               {activeView === 'dashboard' ? (
                 <Dashboard key="dashboard" isDefending={isDefending} isProcessing={isProcessing} isBreached={isBreached} stats={stats} />
+              ) : activeView === 'map' ? (
+                <ThreatMap key="map" />
+              ) : activeView === 'rules' ? (
+                <RuleBuilder key="rules" />
+              ) : activeView === 'fuzzer' ? (
+                <RedTeamFuzzer key="fuzzer" />
+              ) : activeView === 'rag' ? (
+                <RagScanner key="rag" />
               ) : activeView === 'chat' ? (
                 <DirectChat key="chat" backendConnected={backendConnected} />
               ) : (
