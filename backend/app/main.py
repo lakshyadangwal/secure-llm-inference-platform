@@ -336,6 +336,16 @@ async def stream_fuzzer(iterations: int = 10, delay: float = 2.0):
             
     return StreamingResponse(event_generator(), media_type="text/event-stream")
 
+@app.post("/api/redteam/stop")
+async def stop_fuzzer():
+    redteam_fuzzer.stop()
+    return {"status": "stopped"}
+
+@app.post("/api/rag/scan")
+async def scan_document(file: UploadFile = File(...)):
+    result = await rag_scanner.process_file(file, rules_engine.evaluate)
+    return result
+
 @app.get("/api/stats")
 async def get_stats():
     """Get current system statistics"""
