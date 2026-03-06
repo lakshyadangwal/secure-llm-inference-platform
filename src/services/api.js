@@ -9,18 +9,18 @@ import axios from 'axios';
 const getApiBaseUrl = () => {
   const hostname = window.location.hostname;
   const port = 8000;
-  
+
   // If accessed via localhost, use localhost for API
   if (hostname === 'localhost' || hostname === '127.0.0.1') {
     return 'http://localhost:8000';
   }
-  
+
   // If accessed via network IP, use same IP for API
   return `http://${hostname}:${port}`;
 };
 
-const API_BASE_URL = import.meta.env.VITE_API_URL === 'auto' 
-  ? getApiBaseUrl() 
+const API_BASE_URL = import.meta.env.VITE_API_URL === 'auto'
+  ? getApiBaseUrl()
   : (import.meta.env.VITE_API_URL || getApiBaseUrl());
 
 const api = axios.create({
@@ -31,9 +31,14 @@ const api = axios.create({
   timeout: 30000,
 });
 
-// Add request interceptor
+// Add request interceptor - attach auth token
 api.interceptors.request.use(
   (config) => {
+    const userData = sessionStorage.getItem("ns_google_user");
+    const credential = sessionStorage.getItem("ns_google_credential");
+    if (credential) {
+      config.headers.Authorization = `Bearer ${credential}`;
+    }
     return config;
   },
   (error) => {

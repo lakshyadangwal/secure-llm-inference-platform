@@ -4,7 +4,7 @@ FastAPI server for LLM security testing with Ollama integration
 Enhanced with auto-detection, logging, and configuration
 """
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends, Header as FastAPIHeader
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import subprocess
@@ -14,15 +14,9 @@ import os
 import logging
 import random
 from datetime import datetime
-from typing import Optional, List
-from fastapi import File, UploadFile
-from fastapi.responses import StreamingResponse
-
-# Import new security modules
-from app.dlp import dlp_engine
-from app.rules_engine import rules_engine
-from app.redteam import redteam_fuzzer
-from app.rag_scanner import rag_scanner
+from typing import Optional
+from google.oauth2 import id_token
+from google.auth.transport import requests as google_requests
 
 # Setup logging
 log_dir = os.path.join(os.path.dirname(__file__), "..", "logs")
@@ -85,6 +79,26 @@ if not OLLAMA_MODEL:
     OLLAMA_MODEL = "llama3"  # Fallback
 
 logger.info(f"🤖 Selected model: {OLLAMA_MODEL}")
+
+# Google OAuth Client ID (must match frontend)
+GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "YOUR_GOOGLE_CLIENT_ID")
+
+# Token verification dependency
+async def verify_google_token(authorization: Optional[str] = FastAPIHeader(None)):
+    """Verify Google ID token from Authorization header"""
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Missing or invalid Authorization header")
+    
+    token = authorization.split(" ", 1)[1]
+    try:
+        idinfo = id_token.verify_oauth2_token(
+            token, google_requests.Request(), GOOGLE_CLIENT_ID
+        )
+        logger.info(f"🔐 Authenticated user: {idinfo.get('email', 'unknown')}")
+        return idinfo
+    except ValueError as e:
+        logger.warning(f"⚠️  Token verification failed: {e}")
+        raise HTTPException(status_code=401, detail="Invalid or expired token")
 
 app = FastAPI(
     title="Neuro-Sentry Defense API",
@@ -204,7 +218,7 @@ async def health():
     }
 
 @app.post("/chat")
-async def chat(request: ChatRequest):
+async def chat(request: ChatRequest, user_info: dict = Depends(verify_google_token)):
     """
     Direct chat endpoint - sends prompt to Ollama
     Used by Direct Neural Link tab
@@ -231,7 +245,7 @@ async def chat(request: ChatRequest):
         )
 
 @app.post("/api/prompt")
-async def analyze_prompt(request: PromptRequest):
+async def analyze_prompt(request: PromptRequest, user_info: dict = Depends(verify_google_token)):
     """
     Analyze prompt with full security pipeline (Rules + LLM + DLP)
     """
