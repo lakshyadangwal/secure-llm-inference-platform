@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { ThemeProvider } from './context/ThemeContext';
 import Header from './components/Header';
 import DefenseToggle from './components/DefenseToggle';
@@ -13,6 +13,7 @@ import RuleBuilder from './components/RuleBuilder';
 import RedTeamFuzzer from './components/RedTeamFuzzer';
 import ThreatMap from './components/ThreatMap';
 import RagScanner from './components/RagScanner';
+import IndexPage from './components/IndexPage';
 import { attackScenarios } from './data/attackScenarios';
 import { sendPrompt, getSystemStats } from './services/api';
 
@@ -153,17 +154,19 @@ function AppInner() {
       {/* Fixed defense toggle */}
       <DefenseToggle isDefending={isDefending} onToggle={() => setIsDefending(!isDefending)} />
 
-      {/* Main layout — mt-20 clears the fixed header */}
-      <div className="mt-20 flex h-[calc(100vh-5rem-12rem)] overflow-hidden">
-        <AttackSidebar
-          attacks={attacks}
-          selectedId={selectedAttack.id}
-          onSelect={(attack) => { setSelectedAttack(attack); setActiveView('lab'); }}
-        />
+      {/* Main layout — fixed exactly below the 5rem (80px) header */}
+      <div className="fixed top-20 bottom-0 left-0 right-0 flex overflow-hidden">
+        {activeView === 'lab' && (
+          <AttackSidebar
+            attacks={attacks}
+            selectedId={selectedAttack.id}
+            onSelect={(attack) => { setSelectedAttack(attack); setActiveView('lab'); }}
+          />
+        )}
 
-        <main className="flex-1 flex flex-col overflow-hidden">
+        <main className="flex-1 flex flex-col min-w-0">
           {/* Tab bar */}
-          <div className="flex flex-wrap items-center gap-2 px-8 py-4 border-b border-[var(--border-primary)] bg-[var(--card-bg)]">
+          <div className="flex flex-wrap items-center gap-2 px-8 py-4 border-b border-[var(--border-primary)] bg-[var(--card-bg)] flex-shrink-0 relative z-30 shadow-md">
             {['dashboard', 'map', 'rules', 'fuzzer', 'rag', 'lab', 'chat'].map((view) => {
               const labels = {
                 dashboard: 'Overview',
@@ -204,7 +207,7 @@ function AppInner() {
           </div>
 
           {/* Active view */}
-          <div className="flex-1 overflow-hidden relative">
+          <div className="flex-1 overflow-y-auto p-4 scrollbar-hide">
             <AnimatePresence mode="wait">
               {activeView === 'dashboard' ? (
                 <Dashboard key="dashboard" isDefending={isDefending} isProcessing={isProcessing} isBreached={isBreached} stats={stats} />
@@ -229,54 +232,66 @@ function AppInner() {
 
             {/* Access Denied Overlay */}
             {!user && activeView !== 'dashboard' && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center z-40"
-                style={{ background: 'linear-gradient(180deg, rgba(10,15,26,0.97) 0%, rgba(10,15,26,0.99) 100%)' }}>
-
-                {/* Warning Icon */}
-                <div className="relative mb-6">
-                  <div className="w-20 h-20 rounded-full flex items-center justify-center"
-                    style={{ background: 'rgba(239,68,68,0.08)', border: '2px solid rgba(239,68,68,0.3)', boxShadow: '0 0 40px rgba(239,68,68,0.15)' }}>
-                    <svg className="w-10 h-10" fill="none" stroke="rgba(239,68,68,0.8)" viewBox="0 0 24 24" strokeWidth={1.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
-                    </svg>
-                  </div>
-                  <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-red-500 animate-pulse" style={{ boxShadow: '0 0 12px rgba(239,68,68,0.6)' }} />
-                </div>
-
-                {/* Title */}
-                <div className="text-center mb-8">
-                  <h2 className="text-2xl font-bold font-mono tracking-widest mb-2" style={{ color: 'rgba(239,68,68,0.9)', textShadow: '0 0 20px rgba(239,68,68,0.3)' }}>
-                    ACCESS DENIED
-                  </h2>
-                  <p className="text-xs font-mono tracking-wider" style={{ color: 'rgba(255,255,255,0.35)' }}>
-                    CLEARANCE LEVEL INSUFFICIENT — AUTHENTICATION REQUIRED
-                  </p>
-                </div>
-
-                {/* Info Box */}
-                <div className="mb-8 px-6 py-4 rounded-lg max-w-sm text-center"
-                  style={{ background: 'rgba(239,68,68,0.04)', border: '1px solid rgba(239,68,68,0.15)' }}>
-                  <p className="text-xs font-mono leading-relaxed" style={{ color: 'rgba(255,255,255,0.4)' }}>
-                    <span style={{ color: 'rgba(239,68,68,0.7)' }}>▶</span> Module: <span className="font-bold" style={{ color: 'rgba(255,255,255,0.6)' }}>{activeView === 'lab' ? 'ATTACK LAB' : 'DIRECT NEURAL LINK'}</span><br />
-                    <span style={{ color: 'rgba(239,68,68,0.7)' }}>▶</span> Status: <span className="font-bold" style={{ color: 'rgba(239,68,68,0.8)' }}>LOCKED</span><br />
-                    <span style={{ color: 'rgba(239,68,68,0.7)' }}>▶</span> Required: <span className="font-bold" style={{ color: '#00ffb4' }}>GOOGLE SSO</span>
-                  </p>
-                </div>
-
-                {/* CTA */}
-                <button onClick={() => {
-                  const loginBtn = document.querySelector('[style*="LOGIN"]') || document.querySelector('button');
-                  // Trigger login modal by dispatching a custom event
-                  window.dispatchEvent(new CustomEvent('ns-open-login'));
-                }}
-                  className="group px-8 py-3 rounded-lg font-mono text-sm font-bold tracking-wider transition-all duration-300"
-                  style={{ background: 'rgba(0,255,180,0.08)', border: '1px solid rgba(0,255,180,0.4)', color: '#00ffb4' }}
-                  onMouseEnter={e => { e.currentTarget.style.background = 'rgba(0,255,180,0.15)'; e.currentTarget.style.boxShadow = '0 0 24px rgba(0,255,180,0.25)'; }}
-                  onMouseLeave={e => { e.currentTarget.style.background = 'rgba(0,255,180,0.08)'; e.currentTarget.style.boxShadow = 'none'; }}
+              <motion.div
+                initial={{ opacity: 0, backdropFilter: 'blur(0px)' }}
+                animate={{ opacity: 1, backdropFilter: 'blur(10px)' }}
+                exit={{ opacity: 0, backdropFilter: 'blur(0px)' }}
+                transition={{ duration: 0.2 }}
+                className="absolute inset-0 flex flex-col items-center justify-center z-40"
+                style={{ background: 'linear-gradient(180deg, rgba(10,15,26,0.97) 0%, rgba(10,15,26,0.99) 100%)' }}
+              >
+                <motion.div
+                  initial={{ scale: 0.8, y: 30, opacity: 0 }}
+                  animate={{ scale: 1, y: 0, opacity: 1 }}
+                  transition={{ type: 'spring', damping: 20, stiffness: 300, delay: 0.1 }}
+                  className="flex flex-col items-center"
                 >
-                  ⬡ SIGN IN TO CONTINUE
-                </button>
-              </div>
+                  {/* Warning Icon */}
+                  <div className="relative mb-6">
+                    <div className="w-20 h-20 rounded-full flex items-center justify-center"
+                      style={{ background: 'rgba(239,68,68,0.08)', border: '2px solid rgba(239,68,68,0.3)', boxShadow: '0 0 40px rgba(239,68,68,0.15)' }}>
+                      <svg className="w-10 h-10" fill="none" stroke="rgba(239,68,68,0.8)" viewBox="0 0 24 24" strokeWidth={1.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+                      </svg>
+                    </div>
+                    <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-red-500 animate-pulse" style={{ boxShadow: '0 0 12px rgba(239,68,68,0.6)' }} />
+                  </div>
+
+                  {/* Title */}
+                  <div className="text-center mb-8">
+                    <h2 className="text-2xl font-bold font-mono tracking-widest mb-2" style={{ color: 'rgba(239,68,68,0.9)', textShadow: '0 0 20px rgba(239,68,68,0.3)' }}>
+                      ACCESS DENIED
+                    </h2>
+                    <p className="text-xs font-mono tracking-wider" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                      CLEARANCE LEVEL INSUFFICIENT — AUTHENTICATION REQUIRED
+                    </p>
+                  </div>
+
+                  {/* Info Box */}
+                  <div className="mb-8 px-6 py-4 rounded-lg max-w-sm text-center"
+                    style={{ background: 'rgba(239,68,68,0.04)', border: '1px solid rgba(239,68,68,0.15)' }}>
+                    <p className="text-xs font-mono leading-relaxed" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                      <span style={{ color: 'rgba(239,68,68,0.7)' }}>▶</span> Module: <span className="font-bold" style={{ color: 'rgba(255,255,255,0.6)' }}>{activeView === 'lab' ? 'ATTACK LAB' : 'DIRECT NEURAL LINK'}</span><br />
+                      <span style={{ color: 'rgba(239,68,68,0.7)' }}>▶</span> Status: <span className="font-bold" style={{ color: 'rgba(239,68,68,0.8)' }}>LOCKED</span><br />
+                      <span style={{ color: 'rgba(239,68,68,0.7)' }}>▶</span> Required: <span className="font-bold" style={{ color: '#00ffb4' }}>GOOGLE SSO</span>
+                    </p>
+                  </div>
+
+                  {/* CTA */}
+                  <motion.button
+                    whileHover={{ scale: 1.05, boxShadow: '0 0 24px rgba(0,255,180,0.25)', backgroundColor: 'rgba(0,255,180,0.15)' }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => {
+                      const loginBtn = document.querySelector('[style*="LOGIN"]') || document.querySelector('button');
+                      window.dispatchEvent(new CustomEvent('ns-open-login'));
+                    }}
+                    className="group px-8 py-3 rounded-lg font-mono text-sm font-bold tracking-wider transition-colors duration-300"
+                    style={{ background: 'rgba(0,255,180,0.08)', border: '1px solid rgba(0,255,180,0.4)', color: '#00ffb4' }}
+                  >
+                    ⬡ SIGN IN TO CONTINUE
+                  </motion.button>
+                </motion.div>
+              </motion.div>
             )}
           </div>
         </main>
@@ -301,9 +316,21 @@ function AppInner() {
 }
 
 function App() {
+  const [isAppStarted, setIsAppStarted] = useState(false);
+
   return (
     <ThemeProvider>
-      <AppInner />
+      <AnimatePresence mode="wait">
+        {!isAppStarted ? (
+          <motion.div key="index-page" exit={{ opacity: 0, scale: 0.95, filter: "blur(10px)" }} transition={{ duration: 0.8, ease: "easeInOut" }}>
+            <IndexPage onEnter={() => setIsAppStarted(true)} />
+          </motion.div>
+        ) : (
+          <motion.div key="app-inner" initial={{ opacity: 0, scale: 1.05 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8, ease: "easeInOut" }}>
+            <AppInner />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </ThemeProvider>
   );
 }
