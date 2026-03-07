@@ -54,7 +54,7 @@ from app.services.stats_store import get_stats
 from app.middleware.rate_limiter import RateLimitMiddleware
 
 # Import all routers
-from app.routes import chat, prompt, stats, health, test_attack
+from app.routes import chat, prompt, stats, health, test_attack, playground, analytics, audit_logs, projects, settings, quotas
 
 # ── Initialise logging first ───────────────────────────────────────────
 log_file = setup_logging()
@@ -102,6 +102,12 @@ app.include_router(chat.router)
 app.include_router(prompt.router)
 app.include_router(stats.router)
 app.include_router(test_attack.router)
+app.include_router(playground.router)
+app.include_router(analytics.router)
+app.include_router(audit_logs.router)
+app.include_router(projects.router)
+app.include_router(settings.router)
+app.include_router(quotas.router)
 
 
 class PromptRequest(BaseModel):
