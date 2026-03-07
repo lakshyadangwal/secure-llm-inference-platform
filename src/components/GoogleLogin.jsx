@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-
+import Cookies from "js-cookie";
 // Google Client ID from environment variables
 const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
@@ -12,8 +12,16 @@ export default function GoogleLogin({ onLoginSuccess, onLogout }) {
     const [scanLine, setScanLine] = useState(0);
 
     useEffect(() => {
-        const saved = sessionStorage.getItem("ns_google_user");
-        if (saved) { const u = JSON.parse(saved); setUser(u); onLoginSuccess?.(u); }
+        const saved = Cookies.get("ns_google_user");
+        if (saved) {
+            try {
+                const u = JSON.parse(saved);
+                setUser(u);
+                onLoginSuccess?.(u);
+            } catch (e) {
+                console.error("Failed to parse cookie data", e);
+            }
+        }
         const script = document.createElement("script");
         script.src = "https://accounts.google.com/gsi/client";
         script.async = true; script.defer = true;
@@ -57,15 +65,16 @@ export default function GoogleLogin({ onLoginSuccess, onLogout }) {
         const payload = JSON.parse(atob(response.credential.split(".")[1]));
         const userData = { name: payload.name, email: payload.email, picture: payload.picture };
         setUser(userData);
-        sessionStorage.setItem("ns_google_user", JSON.stringify(userData));
-        sessionStorage.setItem("ns_google_credential", response.credential);
+        setUser(userData);
+        Cookies.set("ns_google_user", JSON.stringify(userData), { expires: 7 });
+        Cookies.set("ns_google_credential", response.credential, { expires: 7 });
         setShowModal(false);
         onLoginSuccess?.(userData);
     }
 
     function logout() {
-        sessionStorage.removeItem("ns_google_user");
-        sessionStorage.removeItem("ns_google_credential");
+        Cookies.remove("ns_google_user");
+        Cookies.remove("ns_google_credential");
         setUser(null); setShowDropdown(false);
         window.google?.accounts?.id?.disableAutoSelect();
         onLogout?.();
