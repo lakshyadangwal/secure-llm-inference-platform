@@ -1124,6 +1124,93 @@ footer {
 .attacks-list.visible .attack-row:nth-child(7) { animation: slideInLeft 0.4s 0.6s ease both; }
 .attacks-list.visible .attack-row:nth-child(8) { animation: slideInLeft 0.4s 0.7s ease both; }
 
+/* ── TECH STACK BADGES ── */
+.tech-stack {
+  margin-top: 2.5rem;
+  width: 100%;
+  max-width: 720px;
+  animation: fadeSlideDown 0.8s 0.7s ease both;
+}
+.tech-stack-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.3em;
+  color: rgba(0,229,255,0.4);
+  display: block;
+  margin-bottom: 0.7rem;
+  text-transform: uppercase;
+}
+html.light .tech-stack-label { color: rgba(0,120,160,0.5); }
+
+.tech-rows { display: flex; flex-direction: column; gap: 0.5rem; }
+
+.tech-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.tech-label-text {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.68rem;
+  color: #c8d8e4;
+  letter-spacing: 0.05em;
+  padding: 0.28rem 0;
+}
+html.light .tech-label-text { color: #334155; }
+
+.tech-badge {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 0.28rem 0.7rem;
+  border-radius: 3px;
+  white-space: nowrap;
+  cursor: default;
+  transition: transform 0.2s, box-shadow 0.2s, filter 0.2s;
+  border: none;
+  margin-right: 0.4rem;
+}
+.tech-badge:hover {
+  transform: translateY(-2px) scale(1.07);
+  filter: brightness(1.2);
+}
+
+.badge-yellow  { background: #3b7a3b; color: #a8e6a8; }
+.badge-yellow:hover { box-shadow: 0 4px 14px rgba(100,200,100,0.4); }
+
+.badge-teal    { background: #7c5c00; color: #ffd966; }
+.badge-teal:hover { box-shadow: 0 4px 14px rgba(255,200,0,0.4); }
+
+.badge-blue    { background: #005fb8; color: #ffffff; }
+.badge-blue:hover { box-shadow: 0 4px 14px rgba(0,100,220,0.5); }
+
+.badge-orange2 { background: #b85c00; color: #ffd0a0; }
+.badge-orange2:hover { box-shadow: 0 4px 14px rgba(220,120,0,0.4); }
+
+.badge-orange  { background: #8b3a00; color: #ffb366; }
+.badge-orange:hover { box-shadow: 0 4px 14px rgba(200,80,0,0.4); }
+
+.badge-purple  { background: #6b21a8; color: #e9d5ff; }
+.badge-purple:hover { box-shadow: 0 4px 14px rgba(130,50,220,0.5); }
+
+.badge-gray    { background: #374151; color: #d1d5db; }
+.badge-gray:hover { box-shadow: 0 4px 14px rgba(100,120,140,0.4); }
+
+.badge-lime    { background: #166534; color: #86efac; }
+.badge-lime:hover { box-shadow: 0 4px 14px rgba(34,197,94,0.4); }
+
+/* subtle entrance animation per badge */
+.tech-row .tech-badge:nth-child(2)  { animation: popIn 0.4s 0.1s ease both; }
+.tech-row .tech-badge:nth-child(4)  { animation: popIn 0.4s 0.2s ease both; }
+.tech-row .tech-badge:nth-child(6)  { animation: popIn 0.4s 0.3s ease both; }
+.tech-row .tech-badge:nth-child(8)  { animation: popIn 0.4s 0.4s ease both; }
+.tech-row .tech-badge:nth-child(10) { animation: popIn 0.4s 0.5s ease both; }
+.tech-row .tech-badge:nth-child(12) { animation: popIn 0.4s 0.6s ease both; }
+.tech-row .tech-badge:nth-child(14) { animation: popIn 0.4s 0.7s ease both; }
+
 /* ── TEAM FLOAT ANIMATIONS ── */
 
 @keyframes popIn {
@@ -1386,6 +1473,27 @@ footer {
       <div class="stat">
         <span class="stat-num" id="cnt-models">0</span>
         <span class="stat-label">LLM Models</span>
+      </div>
+    </div>
+
+    <!-- ── TECH STACK ── -->
+    <div class="tech-stack">
+      <span class="tech-stack-label">BUILT WITH</span>
+      <div class="tech-rows">
+        <!-- Row 1 -->
+        <div class="tech-row">
+          <span class="tech-label-text">Python</span><span class="tech-badge badge-yellow">3.10+</span>
+          <span class="tech-label-text">FastAPI</span><span class="tech-badge badge-teal">0.95</span>
+          <span class="tech-label-text">Frontend</span><span class="tech-badge badge-blue">React</span>
+          <span class="tech-label-text">LLM</span><span class="tech-badge badge-orange2">Groq API</span>
+          <span class="tech-label-text">LLM</span><span class="tech-badge badge-orange">Ollama/Local</span>
+          <span class="tech-label-text">Backend</span><span class="tech-badge badge-purple">Railway</span>
+          <span class="tech-label-text">Frontend</span><span class="tech-badge badge-gray">Vercel</span>
+        </div>
+        <!-- Row 2 -->
+        <div class="tech-row">
+          <span class="tech-label-text">Status</span><span class="tech-badge badge-lime">Active Development</span>
+        </div>
       </div>
     </div>
 
