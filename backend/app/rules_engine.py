@@ -94,14 +94,16 @@ class DynamicRulesEngine:
                 
             if rule["type"] == "regex":
                 try:
-                    if re.search(rule["pattern"], text):
+                    pattern = str(rule.get("pattern", ""))
+                    if re.search(pattern, text):
                         logger.warning(f"🚨 Rule Match [Regex]: {rule['name']}")
                         return {"is_threat": True, "matched_rule_name": rule["name"]}
                 except re.error:
                     logger.error(f"Invalid regex pattern in rule {rule['name']}: {rule['pattern']}")
                     
             elif rule["type"] == "keyword":
-                keywords = [k.strip().lower() for k in rule["pattern"].split(",")]
+                pattern = str(rule.get("pattern", ""))
+                keywords = [k.strip().lower() for k in pattern.split(",")]
                 text_lower = text.lower()
                 for keyword in keywords:
                     if keyword and keyword in text_lower:

@@ -21,10 +21,17 @@ import time
 import logging
 import random
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
+from fastapi import File, UploadFile
+from fastapi.responses import StreamingResponse
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
 
+# Import new security modules
+from app.dlp import dlp_engine
+from app.rules_engine import rules_engine
+from app.redteam import redteam_fuzzer
+from app.rag_scanner import rag_scanner
 # Setup logging
 log_dir = os.path.join(os.path.dirname(__file__), "..", "logs")
 os.makedirs(log_dir, exist_ok=True)
