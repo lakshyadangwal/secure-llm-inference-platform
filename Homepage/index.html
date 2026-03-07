@@ -305,10 +305,21 @@ nav {
   line-height: 1.7;
   margin-bottom: 3rem;
   letter-spacing: 0.02em;
-  animation: fadeSlideDown 0.8s 0.3s ease both;
 }
 
 .hero-sub span { color: var(--cyan); font-weight: 600; }
+
+/* typing cursor */
+.type-cursor {
+  display: inline-block;
+  color: var(--cyan);
+  font-weight: 400;
+  animation: cursorBlink 0.7s step-end infinite;
+  margin-left: 1px;
+  font-size: 1em;
+  vertical-align: baseline;
+}
+.type-cursor.done { display: none; }
 
 .hero-actions {
   display: flex;
@@ -1346,10 +1357,8 @@ footer {
       <span class="hero-title-line2 glitch" data-text="SENTRY">SENTRY</span>
     </h1>
 
-    <p class="hero-sub">
-      A <span>real-time cybersecurity sandbox</span> for testing, breaking, and
-      defending Large Language Models against prompt injection, jailbreaks,
-      and social engineering attacks.
+    <p class="hero-sub" id="hero-sub-text" style="min-height:5rem;">
+      <span id="typed-text"></span><span class="type-cursor">▋</span>
     </p>
 
     <div class="hero-actions">
@@ -1744,7 +1753,66 @@ footer {
 </div>
 
 <script>
-// ── THEME TOGGLE ──
+// ── TYPING EFFECT ──
+(function() {
+  // Segments: [text, isHighlighted]
+  const segments = [
+    { text: 'A ', highlight: false },
+    { text: 'real-time cybersecurity sandbox', highlight: true },
+    { text: ' for testing, breaking, and defending Large Language Models against prompt injection, jailbreaks, and social engineering attacks.', highlight: false },
+  ];
+
+  const target = document.getElementById('typed-text');
+  const cursor = document.querySelector('.type-cursor');
+  if (!target || !cursor) return;
+
+  // Flatten into characters with highlight flag
+  const chars = [];
+  segments.forEach(seg => {
+    for (const ch of seg.text) {
+      chars.push({ ch, highlight: seg.highlight });
+    }
+  });
+
+  let i = 0;
+  let currentSpan = null;
+  let lastHighlight = null;
+
+  function typeNext() {
+    if (i >= chars.length) {
+      // typing done — keep cursor blinking for 1.5s then hide
+      setTimeout(() => cursor.classList.add('done'), 1500);
+      return;
+    }
+
+    const { ch, highlight } = chars[i];
+
+    // Create a new span when highlight mode changes
+    if (highlight !== lastHighlight) {
+      currentSpan = document.createElement(highlight ? 'span' : 'span');
+      if (highlight) {
+        currentSpan.style.color = 'var(--cyan)';
+        currentSpan.style.fontWeight = '600';
+      }
+      target.appendChild(currentSpan);
+      lastHighlight = highlight;
+    }
+
+    currentSpan.textContent += ch;
+    i++;
+
+    // Vary speed: faster for spaces, slower after punctuation
+    let delay = 28;
+    if (ch === ' ') delay = 18;
+    if (ch === ',' || ch === '.') delay = 120;
+    if (ch === '-') delay = 60;
+
+    setTimeout(typeNext, delay);
+  }
+
+  // Start after hero title animation (1.2s delay)
+  setTimeout(typeNext, 1200);
+})();
 const themeBtn = document.getElementById('themeToggle');
 const html = document.documentElement;
 let isLight = false;
