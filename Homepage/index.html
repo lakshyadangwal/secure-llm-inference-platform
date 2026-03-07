@@ -1077,6 +1077,144 @@ footer {
   95% { transform: translateX(2px); opacity: 0.5; }
   97% { transform: translateX(0); opacity: 0; }
 }
+
+/* ── EXTRA ANIMATIONS ── */
+
+/* Floating cards */
+@keyframes floatY {
+  0%,100% { transform: translateY(0px); }
+  50%     { transform: translateY(-8px); }
+}
+.feature-card:nth-child(1) { animation: floatY 5s 0s ease-in-out infinite; }
+.feature-card:nth-child(2) { animation: floatY 5s 0.4s ease-in-out infinite; }
+.feature-card:nth-child(3) { animation: floatY 5s 0.8s ease-in-out infinite; }
+.feature-card:nth-child(4) { animation: floatY 5s 1.2s ease-in-out infinite; }
+.feature-card:nth-child(5) { animation: floatY 5s 1.6s ease-in-out infinite; }
+.feature-card:nth-child(6) { animation: floatY 5s 2.0s ease-in-out infinite; }
+
+/* Neon border pulse on feature cards hover */
+@keyframes neonPulse {
+  0%,100% { box-shadow: 0 0 5px rgba(0,229,255,0.2), 0 0 20px rgba(0,229,255,0.1); }
+  50%     { box-shadow: 0 0 15px rgba(0,229,255,0.5), 0 0 40px rgba(0,229,255,0.2); }
+}
+.feature-card:hover { animation: neonPulse 1.5s ease-in-out infinite !important; }
+
+/* Attack row slide in stagger */
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-30px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.attacks-list.visible .attack-row:nth-child(1) { animation: slideInLeft 0.4s 0.0s ease both; }
+.attacks-list.visible .attack-row:nth-child(2) { animation: slideInLeft 0.4s 0.1s ease both; }
+.attacks-list.visible .attack-row:nth-child(3) { animation: slideInLeft 0.4s 0.2s ease both; }
+.attacks-list.visible .attack-row:nth-child(4) { animation: slideInLeft 0.4s 0.3s ease both; }
+.attacks-list.visible .attack-row:nth-child(5) { animation: slideInLeft 0.4s 0.4s ease both; }
+.attacks-list.visible .attack-row:nth-child(6) { animation: slideInLeft 0.4s 0.5s ease both; }
+.attacks-list.visible .attack-row:nth-child(7) { animation: slideInLeft 0.4s 0.6s ease both; }
+.attacks-list.visible .attack-row:nth-child(8) { animation: slideInLeft 0.4s 0.7s ease both; }
+
+/* Team cards pop in */
+@keyframes popIn {
+  0%   { opacity: 0; transform: scale(0.85) translateY(20px); }
+  70%  { transform: scale(1.03) translateY(-3px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+.team-grid.visible .team-card:nth-child(1) { animation: popIn 0.5s 0.0s ease both; }
+.team-grid.visible .team-card:nth-child(2) { animation: popIn 0.5s 0.15s ease both; }
+.team-grid.visible .team-card:nth-child(3) { animation: popIn 0.5s 0.3s ease both; }
+.team-grid.visible .team-card:nth-child(4) { animation: popIn 0.5s 0.45s ease both; }
+
+/* How-step circles bounce in */
+@keyframes bounceIn {
+  0%   { opacity: 0; transform: scale(0); }
+  60%  { transform: scale(1.2); }
+  80%  { transform: scale(0.9); }
+  100% { opacity: 1; transform: scale(1); }
+}
+.how-grid.visible .how-step:nth-child(1) .how-step-circle { animation: bounceIn 0.6s 0.0s ease both; }
+.how-grid.visible .how-step:nth-child(2) .how-step-circle { animation: bounceIn 0.6s 0.15s ease both; }
+.how-grid.visible .how-step:nth-child(3) .how-step-circle { animation: bounceIn 0.6s 0.3s ease both; }
+.how-grid.visible .how-step:nth-child(4) .how-step-circle { animation: bounceIn 0.6s 0.45s ease both; }
+
+/* Stat numbers zoom in */
+@keyframes zoomIn {
+  from { opacity: 0; transform: scale(0.5); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.hero-stats .stat:nth-child(1) .stat-num { animation: zoomIn 0.5s 1.0s ease both; }
+.hero-stats .stat:nth-child(2) .stat-num { animation: zoomIn 0.5s 1.2s ease both; }
+.hero-stats .stat:nth-child(3) .stat-num { animation: zoomIn 0.5s 1.4s ease both; }
+.hero-stats .stat:nth-child(4) .stat-num { animation: zoomIn 0.5s 1.6s ease both; }
+
+/* CTA box flicker border */
+@keyframes borderFlicker {
+  0%,100% { border-color: var(--border); }
+  48%     { border-color: var(--border); }
+  50%     { border-color: var(--cyan); box-shadow: 0 0 20px rgba(0,229,255,0.3); }
+  52%     { border-color: var(--border); }
+  94%     { border-color: var(--border); }
+  96%     { border-color: var(--cyan); box-shadow: 0 0 30px rgba(0,229,255,0.4); }
+  98%     { border-color: var(--border); }
+}
+.cta-box { animation: borderFlicker 4s ease-in-out infinite; }
+
+/* Nav logo spin on hover */
+.nav-logo:hover .nav-logo-icon::before { animation: hexSpin 1s linear infinite !important; }
+
+/* Attack rate numbers count-up glow */
+@keyframes rateGlow {
+  from { text-shadow: none; }
+  to   { text-shadow: 0 0 12px currentColor; }
+}
+.attack-rate-num { animation: rateGlow 2s ease-in-out infinite alternate; }
+
+/* Section labels slide in from left */
+@keyframes labelSlide {
+  from { opacity: 0; transform: translateX(-20px); letter-spacing: 0.1em; }
+  to   { opacity: 1; transform: translateX(0); letter-spacing: 0.25em; }
+}
+.reveal.visible .section-label { animation: labelSlide 0.6s 0.1s ease both; }
+
+/* Scanline sweep */
+@keyframes scanSweep {
+  0%   { background-position: 0 0; }
+  100% { background-position: 0 100vh; }
+}
+
+/* Hero badge pulse border */
+@keyframes badgePulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(0,255,136,0); }
+  50%     { box-shadow: 0 0 0 6px rgba(0,255,136,0.1); }
+}
+.hero-badge { animation: badgePulse 2.5s ease-in-out infinite; }
+
+/* Scroll hint bob */
+@keyframes bob {
+  0%,100% { transform: translateX(-50%) translateY(0); }
+  50%     { transform: translateX(-50%) translateY(6px); }
+}
+.scroll-hint { animation: bob 2s ease-in-out infinite; }
+
+/* Footer status dot ping */
+@keyframes ping {
+  0%    { transform: scale(1); opacity: 1; }
+  75%,100% { transform: scale(2); opacity: 0; }
+}
+.footer-status::after {
+  content: '';
+  position: absolute;
+  width: 6px; height: 6px;
+  background: var(--green);
+  border-radius: 50%;
+  animation: ping 1.5s ease-in-out infinite;
+}
+.footer-status { position: relative; }
+
+/* Typing cursor blink for hero badge */
+@keyframes typeIn {
+  from { width: 0; }
+  to   { width: 100%; }
+}
 </style>
 </head>
 <body>
@@ -1620,10 +1758,16 @@ const observer = new IntersectionObserver((entries) => {
   entries.forEach(e => {
     if (e.isIntersecting) {
       e.target.classList.add('visible');
+      // trigger child grid animations too
+      const grid = e.target.querySelector('.team-grid, .how-grid, .attacks-list');
+      if (grid) grid.classList.add('visible');
     }
   });
 }, { threshold: 0.15 });
 reveals.forEach(r => observer.observe(r));
+
+// also observe grids directly
+document.querySelectorAll('.team-grid, .how-grid, .attacks-list').forEach(el => observer.observe(el));
 
 // Hero stats counter on page load
 window.addEventListener('load', () => {
