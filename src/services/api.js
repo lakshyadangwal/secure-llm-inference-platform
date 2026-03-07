@@ -96,7 +96,11 @@ export const sendChatMessage = async (prompt) => {
   }
 };
 
-// Export the current API URL for display purposes
 export const getApiUrl = () => API_BASE_URL;
 
+// Add properties expected by custom components
+api.baseURL = API_BASE_URL;
+api.analyzePrompt = sendPrompt;
+
+export { api };
 export default api;

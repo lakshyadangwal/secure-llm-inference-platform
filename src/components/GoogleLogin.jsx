@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-
+import Cookies from "js-cookie";
 // Google Client ID from environment variables
 const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
@@ -12,8 +12,16 @@ export default function GoogleLogin({ onLoginSuccess, onLogout }) {
     const [scanLine, setScanLine] = useState(0);
 
     useEffect(() => {
-        const saved = sessionStorage.getItem("ns_google_user");
-        if (saved) { const u = JSON.parse(saved); setUser(u); onLoginSuccess?.(u); }
+        const saved = Cookies.get("ns_google_user");
+        if (saved) {
+            try {
+                const u = JSON.parse(saved);
+                setUser(u);
+                onLoginSuccess?.(u);
+            } catch (e) {
+                console.error("Failed to parse cookie data", e);
+            }
+        }
         const script = document.createElement("script");
         script.src = "https://accounts.google.com/gsi/client";
         script.async = true; script.defer = true;
@@ -57,15 +65,16 @@ export default function GoogleLogin({ onLoginSuccess, onLogout }) {
         const payload = JSON.parse(atob(response.credential.split(".")[1]));
         const userData = { name: payload.name, email: payload.email, picture: payload.picture };
         setUser(userData);
-        sessionStorage.setItem("ns_google_user", JSON.stringify(userData));
-        sessionStorage.setItem("ns_google_credential", response.credential);
+        setUser(userData);
+        Cookies.set("ns_google_user", JSON.stringify(userData), { expires: 7 });
+        Cookies.set("ns_google_credential", response.credential, { expires: 7 });
         setShowModal(false);
         onLoginSuccess?.(userData);
     }
 
     function logout() {
-        sessionStorage.removeItem("ns_google_user");
-        sessionStorage.removeItem("ns_google_credential");
+        Cookies.remove("ns_google_user");
+        Cookies.remove("ns_google_credential");
         setUser(null); setShowDropdown(false);
         window.google?.accounts?.id?.disableAutoSelect();
         onLogout?.();
@@ -152,32 +161,7 @@ export default function GoogleLogin({ onLoginSuccess, onLogout }) {
                         <span style={{ color: teal }}>&#x25B6;</span> Session token lifetime: 24h
                     </div>
 
-                    <div id="ns-google-btn" style={{ marginBottom: 12, display: "flex", justifyContent: "center" }} />
-
-                    <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "16px 0" }}>
-                        <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.08)" }} />
-                        <span style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", fontFamily: "monospace" }}>OR</span>
-                        <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.08)" }} />
-                    </div>
-
-                    <button onClick={() => {
-                        if (!window.google) return;
-                        window.google.accounts.id.initialize({ client_id: CLIENT_ID, callback: handleCredentialResponse });
-                        window.google.accounts.id.prompt();
-                    }}
-                        style={{
-                            display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
-                            width: "100%", padding: 12, background: "rgba(0,255,180,0.06)",
-                            border: "1px solid rgba(0,255,180,0.35)", borderRadius: 8,
-                            fontSize: 13, fontWeight: 700, color: teal, cursor: "pointer",
-                            fontFamily: "Courier New, monospace", letterSpacing: "0.06em",
-                            transition: "all 0.15s", boxSizing: "border-box",
-                        }}
-                        onMouseEnter={e => { e.currentTarget.style.background = "rgba(0,255,180,0.12)"; e.currentTarget.style.boxShadow = "0 0 16px rgba(0,255,180,0.2)"; }}
-                        onMouseLeave={e => { e.currentTarget.style.background = "rgba(0,255,180,0.06)"; e.currentTarget.style.boxShadow = "none"; }}
-                    >
-                        <GoogleIcon /> CONNECT WITH GOOGLE
-                    </button>
+                    <div id="ns-google-btn" style={{ marginTop: 24, marginBottom: 24, display: "flex", justifyContent: "center" }} />
 
                     <p style={{ fontSize: 10, color: "rgba(255,255,255,0.25)", marginTop: 20, textAlign: "center", lineHeight: 1.6, fontFamily: "monospace" }}>
                         AUTHENTICATION REQUIRED FOR FULL SYSTEM ACCESS<br />

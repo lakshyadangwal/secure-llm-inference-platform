@@ -24,15 +24,23 @@ const Header = ({ backendConnected = false, user, onLoginSuccess, onLogout }) =>
       <div className="h-full px-8 flex items-center justify-between">
         {/* Logo */}
         <div className="flex items-center gap-4">
-          <div className="relative">
+          <motion.div
+            className="relative cursor-pointer"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
             <div className="absolute inset-0 bg-gradient-to-br from-cyan-500 to-blue-600 blur-xl opacity-50 animate-pulse"></div>
-            <div className="relative w-12 h-12 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-lg flex items-center justify-center">
+            <motion.div
+              className="relative w-12 h-12 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg"
+              whileHover={{ rotate: 180 }}
+              transition={{ duration: 0.4, ease: "easeInOut" }}
+            >
               <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                   d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
               </svg>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
           <div>
             <h1 className="text-2xl font-bold bg-gradient-to-r from-[var(--text-primary)] via-cyan-300 to-blue-400 bg-clip-text text-transparent tracking-tight">
               NEURO-SENTRY

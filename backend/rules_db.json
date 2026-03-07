@@ -1,0 +1,18 @@
+[
+  {
+    "id": "a91be7be-91ad-419a-aa6f-86959ba507d1",
+    "name": "Default Jailbreak Block",
+    "type": "regex",
+    "pattern": "(?i)(ignore previous|do anything now|ignore all)",
+    "action": "block",
+    "active": true
+  },
+  {
+    "id": "4ddad1c5-59d9-4b16-aa87-42be453fbbd2",
+    "name": "Default Data Extraction Block",
+    "type": "keyword",
+    "pattern": "system prompt,credentials,api key",
+    "action": "block",
+    "active": true
+  }
+]
