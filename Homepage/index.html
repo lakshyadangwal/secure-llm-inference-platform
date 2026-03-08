@@ -775,6 +775,154 @@ section {
   to   { opacity: 1; transform: translateX(0); }
 }
 
+/* ── LIVE THREAT COUNTER ── */
+.threat-counter-section {
+  padding: 6rem 2rem;
+  position: relative;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  background: rgba(0,229,255,0.015);
+}
+
+.threat-grid {
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+}
+@media(max-width:700px){ .threat-grid { grid-template-columns: repeat(2,1fr); } }
+
+.threat-tile {
+  background: rgba(0,229,255,0.04);
+  border: 1px solid rgba(0,229,255,0.15);
+  border-radius: 4px;
+  padding: 1.8rem 1.2rem 1.4rem;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.threat-tile:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(0,229,255,0.12);
+}
+.threat-tile-red    { border-color: rgba(255,45,85,0.2);   background: rgba(255,45,85,0.04); }
+.threat-tile-green  { border-color: rgba(0,255,136,0.2);   background: rgba(0,255,136,0.04); }
+.threat-tile-purple { border-color: rgba(139,92,246,0.2);  background: rgba(139,92,246,0.04); }
+
+.threat-tile::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(0,229,255,0.03) 0%, transparent 60%);
+  pointer-events: none;
+}
+.threat-tile-red::before    { background: linear-gradient(135deg, rgba(255,45,85,0.05) 0%, transparent 60%); }
+.threat-tile-green::before  { background: linear-gradient(135deg, rgba(0,255,136,0.05) 0%, transparent 60%); }
+.threat-tile-purple::before { background: linear-gradient(135deg, rgba(139,92,246,0.05) 0%, transparent 60%); }
+
+.threat-tile-icon { font-size: 1.4rem; margin-bottom: 0.6rem; }
+
+.threat-tile-num {
+  font-family: 'Orbitron', monospace;
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  font-weight: 800;
+  color: var(--cyan);
+  letter-spacing: 0.05em;
+  line-height: 1;
+  margin-bottom: 0.5rem;
+}
+.threat-tile-red    .threat-tile-num { color: var(--red); }
+.threat-tile-green  .threat-tile-num { color: var(--green); }
+.threat-tile-purple .threat-tile-num { color: #a78bfa; }
+
+.threat-tile-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #c8d8e4;
+  margin-bottom: 1rem;
+}
+html.light .threat-tile-label { color: #334155; }
+html.light .threat-tile { background: rgba(255,255,255,0.9); border-color: rgba(0,150,180,0.2); }
+
+.threat-tile-bar {
+  height: 3px;
+  background: rgba(255,255,255,0.07);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.threat-tile-fill {
+  height: 100%;
+  background: var(--cyan);
+  border-radius: 2px;
+  animation: barPulse 2s ease-in-out infinite;
+}
+.threat-tile-red    .threat-tile-fill { background: var(--red); }
+.threat-tile-green  .threat-tile-fill { background: var(--green); }
+.threat-tile-purple .threat-tile-fill { background: #a78bfa; }
+
+@keyframes barPulse {
+  0%,100% { opacity: 0.7; }
+  50%     { opacity: 1; }
+}
+
+/* feed ticker */
+.threat-feed {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  background: rgba(0,0,0,0.3);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 0.6rem 1rem;
+  overflow: hidden;
+}
+html.light .threat-feed { background: rgba(255,255,255,0.8); }
+
+.feed-live-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--red);
+  flex-shrink: 0;
+  animation: ping 1.2s ease-in-out infinite;
+  position: relative;
+}
+.feed-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  color: var(--red);
+  flex-shrink: 0;
+}
+.feed-track-wrap {
+  overflow: hidden;
+  flex: 1;
+  mask-image: linear-gradient(90deg, transparent, black 5%, black 95%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, black 5%, black 95%, transparent);
+}
+.feed-track {
+  display: flex;
+  gap: 3rem;
+  width: max-content;
+  animation: marquee 18s linear infinite;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.68rem;
+  color: #c8d8e4;
+  white-space: nowrap;
+}
+html.light .feed-track { color: #0f172a; }
+.feed-event { display: flex; align-items: center; gap: 0.5rem; }
+.feed-event-tag {
+  font-size: 0.58rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 2px;
+  font-weight: 700;
+}
+.feed-tag-block  { background: rgba(0,255,136,0.2);  color: #00ff88; }
+.feed-tag-detect { background: rgba(0,229,255,0.2);  color: #00e5ff; }
+.feed-tag-alert  { background: rgba(255,45,85,0.2);  color: #ff2d55; }
+
 /* ── CTA SECTION ── */
 .cta-section {
   text-align: center;
@@ -1951,6 +2099,51 @@ html.light .tech-label-text { color: #334155; }
   </section>
 
   <!-- ── CTA ── -->
+  <!-- ── LIVE THREAT COUNTER ── -->
+  <section class="threat-counter-section">
+    <div class="reveal" style="max-width:1100px;margin:0 auto;text-align:center;">
+      <div class="section-label">Live Intelligence</div>
+      <h2 class="section-title" style="margin-bottom:0.5rem;">Global Threat Monitor</h2>
+      <p class="section-desc" style="margin-bottom:3rem;">Real-time simulation of LLM attack attempts across all active sessions.</p>
+
+      <div class="threat-grid">
+        <div class="threat-tile">
+          <div class="threat-tile-icon">⚡</div>
+          <div class="threat-tile-num" id="live-attacks">0</div>
+          <div class="threat-tile-label">Attacks Simulated</div>
+          <div class="threat-tile-bar"><div class="threat-tile-fill" style="width:87%"></div></div>
+        </div>
+        <div class="threat-tile threat-tile-red">
+          <div class="threat-tile-icon">🛡</div>
+          <div class="threat-tile-num" id="live-blocked">0</div>
+          <div class="threat-tile-label">Threats Blocked</div>
+          <div class="threat-tile-bar"><div class="threat-tile-fill" style="width:94%"></div></div>
+        </div>
+        <div class="threat-tile threat-tile-green">
+          <div class="threat-tile-icon">🔍</div>
+          <div class="threat-tile-num" id="live-scans">0</div>
+          <div class="threat-tile-label">Prompt Scans</div>
+          <div class="threat-tile-bar"><div class="threat-tile-fill" style="width:72%"></div></div>
+        </div>
+        <div class="threat-tile threat-tile-purple">
+          <div class="threat-tile-icon">⏱</div>
+          <div class="threat-tile-num" id="live-response"><span>0</span>ms</div>
+          <div class="threat-tile-label">Avg Response Time</div>
+          <div class="threat-tile-bar"><div class="threat-tile-fill" style="width:60%"></div></div>
+        </div>
+      </div>
+
+      <!-- Live feed ticker -->
+      <div class="threat-feed">
+        <span class="feed-live-dot"></span>
+        <span class="feed-label">LIVE FEED</span>
+        <div class="feed-track-wrap">
+          <div class="feed-track" id="feed-track"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section class="cta-section" id="launch">
     <div class="cta-inner reveal">
       <div class="cta-pre">Ready to Deploy</div>
@@ -2086,6 +2279,64 @@ html.light .tech-label-text { color: #334155; }
 </div>
 
 <script>
+// ── LIVE THREAT COUNTER ──
+(function() {
+  let attacks  = 1247832;
+  let blocked  = 1172641;
+  let scans    = 3891204;
+  let response = 142;
+
+  function fmt(n) {
+    return n.toLocaleString();
+  }
+
+  function tick() {
+    attacks  += Math.floor(Math.random() * 4) + 1;
+    blocked  += Math.floor(Math.random() * 3) + 1;
+    scans    += Math.floor(Math.random() * 8) + 3;
+    response  = 120 + Math.floor(Math.random() * 60);
+
+    const la = document.getElementById('live-attacks');
+    const lb = document.getElementById('live-blocked');
+    const ls = document.getElementById('live-scans');
+    const lr = document.getElementById('live-response');
+
+    if (la) la.textContent = fmt(attacks);
+    if (lb) lb.textContent = fmt(blocked);
+    if (ls) ls.textContent = fmt(scans);
+    if (lr) lr.innerHTML = `<span>${response}</span>ms`;
+  }
+
+  // init immediately
+  tick();
+  setInterval(tick, 1400);
+
+  // live feed events
+  const events = [
+    { tag: 'BLOCKED',  cls: 'feed-tag-block',  msg: 'DAN jailbreak attempt neutralized — session #4821' },
+    { tag: 'DETECTED', cls: 'feed-tag-detect', msg: 'Prompt injection pattern identified in user input' },
+    { tag: 'ALERT',    cls: 'feed-tag-alert',  msg: 'Role confusion attack sequence flagged — model: llama3' },
+    { tag: 'BLOCKED',  cls: 'feed-tag-block',  msg: 'Social engineering vector blocked — confidence 98.4%' },
+    { tag: 'DETECTED', cls: 'feed-tag-detect', msg: 'Jailbreak escalation attempt — 3 layers deep' },
+    { tag: 'BLOCKED',  cls: 'feed-tag-block',  msg: 'Token smuggling attempt blocked — model: mistral' },
+    { tag: 'ALERT',    cls: 'feed-tag-alert',  msg: 'Adversarial suffix detected in base64-encoded payload' },
+    { tag: 'DETECTED', cls: 'feed-tag-detect', msg: 'Context window poisoning attempt in system prompt' },
+    { tag: 'BLOCKED',  cls: 'feed-tag-block',  msg: 'Many-shot jailbreak neutralized — 47 examples stripped' },
+    { tag: 'ALERT',    cls: 'feed-tag-alert',  msg: 'Indirect injection via external content — blocked' },
+  ];
+
+  const track = document.getElementById('feed-track');
+  if (track) {
+    // duplicate for seamless loop
+    [...events, ...events].forEach(e => {
+      const el = document.createElement('span');
+      el.className = 'feed-event';
+      el.innerHTML = `<span class="feed-event-tag ${e.cls}">${e.tag}</span>${e.msg}`;
+      track.appendChild(el);
+    });
+  }
+})();
+
 // ── SCROLL PROGRESS BAR ──
 const scrollBar = document.getElementById('scroll-progress');
 window.addEventListener('scroll', () => {
