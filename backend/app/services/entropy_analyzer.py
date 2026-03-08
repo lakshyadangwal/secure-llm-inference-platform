@@ -89,11 +89,11 @@ def _shannon_entropy(text: str) -> float:
         return 0.0
     counts = Counter(text)
     length = len(text)
-    entropy = 0.0
+    entropy: float = 0.0
     for count in counts.values():
-        p = count / length
+        p: float = count / length
         if p > 0:
-            entropy -= p * math.log2(p)
+            entropy = float(entropy - (p * math.log2(p)))  # type: ignore[operator]
     return entropy
 
 
@@ -102,7 +102,7 @@ def _segment_entropies(text: str, seg_len: int = SEGMENT_LENGTH) -> list[float]:
     if len(text) < seg_len:
         return [_shannon_entropy(text)]
     return [
-        _shannon_entropy(text[i:i+seg_len])
+        _shannon_entropy(text[i:i+seg_len])  # type: ignore[index]
         for i in range(0, len(text) - seg_len + 1, seg_len // 2)
     ]
 
@@ -126,12 +126,12 @@ def _kl_divergence_from_english(text: str) -> float:
     total = sum(counts.values())
     if total == 0:
         return 0.0
-    kl = 0.0
+    kl: float = 0.0
     for char, eng_prob in _EN_FREQ.items():
         obs_count = counts.get(char, 0)
-        obs_prob = obs_count / total if total > 0 else 1e-10
+        obs_prob: float = obs_count / total if total > 0 else 1e-10
         if obs_prob > 0 and eng_prob > 0:
-            kl += obs_prob * math.log2(obs_prob / eng_prob)
+            kl = float(kl + (obs_prob * math.log2(obs_prob / eng_prob)))  # type: ignore[operator]
     return abs(kl)
 
 

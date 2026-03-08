@@ -92,20 +92,20 @@ def _word_shingles(text: str, k: int = SHINGLE_SIZE) -> set:
     words = _normalise(text).split()
     if len(words) < k:
         return {" ".join(words)}
-    return {" ".join(words[i:i+k]) for i in range(len(words) - k + 1)}
+    return {" ".join(words[i:i+k]) for i in range(len(words) - k + 1)}  # type: ignore[index]
 
 
 def _shingle_hash(text: str) -> str:
     """SHA-256 of sorted shingle set — order-independent bag-of-ngrams."""
     shingles = sorted(_word_shingles(text))
     joined = "|".join(shingles)
-    return hashlib.sha256(joined.encode()).hexdigest()[:16]
+    return hashlib.sha256(joined.encode()).hexdigest()[:16]  # type: ignore[index, return-value]
 
 
 def _char_ngrams(text: str, n: int = 4) -> list[str]:
     """Character n-grams."""
     text = _normalise(text)
-    return [text[i:i+n] for i in range(max(0, len(text) - n + 1))]
+    return [text[i:i+n] for i in range(max(0, len(text) - n + 1))]  # type: ignore[index]
 
 
 def _minhash_signature(text: str, num_hashes: int = MINHASH_BANDS * MINHASH_ROWS) -> list[int]:
@@ -174,19 +174,19 @@ def _simhash(text: str) -> str:
     Returns a 16-char hex string.
     """
     shingles = list(_word_shingles(text))
-    v = [0] * 64
+    v: list[int] = [0] * 64
     for shingle in shingles:
         h = int(hashlib.md5(shingle.encode()).hexdigest(), 16)
         for i in range(64):
             if h & (1 << i):
-                v[i] += 1
+                v[i] = v[i] + 1  # type: ignore[operator]
             else:
-                v[i] -= 1
+                v[i] = v[i] - 1  # type: ignore[operator]
     # Build fingerprint bit by bit
-    fp = 0
+    fp: int = 0
     for i in range(64):
-        if v[i] > 0:
-            fp |= (1 << i)
+        if v[i] > 0:  # type: ignore[operator]
+            fp = fp | (1 << i)  # type: ignore[operator]
     return format(fp, "016x")
 
 
@@ -284,7 +284,7 @@ class PayloadFingerprinter:
                     self._records.pop(oldest, None)
                 self._records[fp] = FingerprintRecord(
                     fingerprint=fp,
-                    prompt_preview=text[:80],
+                    prompt_preview=text[:80],  # type: ignore[index]
                     ip=ip,
                     timestamp=time.time(),
                     is_attack=is_known_attack,

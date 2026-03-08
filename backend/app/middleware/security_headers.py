@@ -155,12 +155,12 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         if response.status_code >= 500:
             logger.error(
                 "🔒 [%s] %s %s → %d  (%.1fms)",
-                request_id[:8], request.method, path, response.status_code, elapsed_ms
+                request_id[:8], request.method, path, response.status_code, elapsed_ms  # type: ignore[index]
             )
         elif elapsed_ms > 5000:
             logger.warning(
                 "🔒 [%s] Slow response: %s %s → %.0fms",
-                request_id[:8], request.method, path, elapsed_ms
+                request_id[:8], request.method, path, elapsed_ms  # type: ignore[index]
             )
 
         return response

@@ -190,24 +190,24 @@ class ThreatReporter:
             return report
 
         # ── Events by type ────────────────────────────────────────────────
-        type_counts: dict[str, int] = defaultdict(int)
+        type_counts: dict[str, int] = {}
         for e in events_in_window:
-            type_counts[e.event_type] += 1
+            type_counts[e.event_type] = type_counts.get(e.event_type, 0) + 1
 
         # ── Top attackers ─────────────────────────────────────────────────
-        ip_counts: dict[str, int] = defaultdict(int)
-        ip_severity: dict[str, float] = defaultdict(float)
+        ip_counts: dict[str, int] = {}
+        ip_severity: dict[str, float] = {}
         for e in events_in_window:
             if e.ip and e.ip != "unknown":
-                ip_counts[e.ip] += 1
-                ip_severity[e.ip] = max(ip_severity[e.ip], e.severity)
+                ip_counts[e.ip] = ip_counts.get(e.ip, 0) + 1
+                ip_severity[e.ip] = max(ip_severity.get(e.ip, 0.0), e.severity)
 
         sorted_ips = sorted(ip_counts.keys(), key=lambda ip: ip_counts[ip], reverse=True)
         top_ips = [
             {
                 "ip": ip,
                 "event_count": ip_counts[ip],
-                "max_severity": round(float(ip_severity[ip]), 2),  # type: ignore[call-overload]
+                "max_severity": round(float(ip_severity.get(ip, 0.0)), 2),  # type: ignore[call-overload]
             }
             for ip in list(sorted_ips)[:10]  # type: ignore[index]
         ]
@@ -236,9 +236,9 @@ class ThreatReporter:
         top_cats_list = [{"category": cat, "count": cnt} for cat, cnt in top_cats]
 
         # ── Timeline buckets ──────────────────────────────────────────────
-        bucket_counts: dict[int, int] = defaultdict(int)
+        bucket_counts: dict[int, int] = {}
         for e in events_in_window:
-            bucket_counts[e.bucket] += 1
+            bucket_counts[e.bucket] = bucket_counts.get(e.bucket, 0) + 1
 
         min_bucket = int(window_start // BUCKET_SIZE_SECONDS)
         max_bucket = int(now // BUCKET_SIZE_SECONDS)
@@ -251,11 +251,11 @@ class ThreatReporter:
 
         # ── Rate metrics ──────────────────────────────────────────────────
         peak = max(bucket_counts.values()) if bucket_counts else 0
-        peak_rpm = (peak / BUCKET_SIZE_SECONDS) * 60.0
+        peak_rpm = float(peak) / BUCKET_SIZE_SECONDS * 60.0
 
-        avg_sev = sum(e.severity for e in events_in_window) / max(total, 1)
-        jb_pct = type_counts.get(ThreatEventType.JAILBREAK_ATTEMPT, 0) / max(total, 1) * 100
-        inj_pct = type_counts.get(ThreatEventType.INJECTION_ATTEMPT, 0) / max(total, 1) * 100
+        avg_sev: float = sum(e.severity for e in events_in_window) / max(total, 1)
+        jb_pct: float = type_counts.get(ThreatEventType.JAILBREAK_ATTEMPT, 0) / max(total, 1) * 100
+        inj_pct: float = type_counts.get(ThreatEventType.INJECTION_ATTEMPT, 0) / max(total, 1) * 100
 
         # ── Summary text ──────────────────────────────────────────────────
         top_cat = top_cats_list[0]["category"] if top_cats_list else "none"

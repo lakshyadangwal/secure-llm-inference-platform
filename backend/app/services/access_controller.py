@@ -103,7 +103,21 @@ _ROLE_PERMS: dict[str, set[str]] = {
         Permission.CONFIG_READ.value,
         Permission.SESSIONS_READ.value,
     },
-    Role.ADMIN.value: {p.value for p in Permission},   # all permissions
+    Role.ADMIN.value: {
+        Permission.HEALTH_READ.value,
+        Permission.STATS_READ.value,
+        Permission.AUDIT_READ.value,
+        Permission.DIAG_READ.value,
+        Permission.THREAT_INTEL_READ.value,
+        Permission.WATCHLIST_READ.value,
+        Permission.WATCHLIST_WRITE.value,
+        Permission.REPUTATION_READ.value,
+        Permission.REPUTATION_WRITE.value,
+        Permission.CONFIG_READ.value,
+        Permission.CONFIG_WRITE.value,
+        Permission.SESSIONS_READ.value,
+        Permission.ADMIN_ALL.value,
+    },
 }
 
 
@@ -159,7 +173,7 @@ class AuthResult:
         return {
             "is_authenticated": self.is_authenticated,
             "is_authorised": self.is_authorised,
-            "role": self.role.value if self.role else None,
+            "role": self.role.value if self.role is not None else None,  # type: ignore[union-attr]
             "key_name": self.key_name,
             "reason": self.reason,
         }

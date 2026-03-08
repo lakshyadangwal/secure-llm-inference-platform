@@ -85,12 +85,18 @@ class WatchlistEntry:
 
     @property
     def is_expired(self) -> bool:
-        return self.expires_at is not None and time.time() > self.expires_at
+        exp = self.expires_at
+        if exp is None:
+            return False
+        return time.time() > float(exp)  # type: ignore[operator]
 
     def matches(self, text: str) -> bool:
-        if not self.enabled or self.is_expired or self._compiled is None:
+        if not self.enabled or self.is_expired:
             return False
-        return bool(self._compiled.search(text))
+        compiled = self._compiled
+        if compiled is None:
+            return False
+        return bool(compiled.search(text))
 
 
 # ── Match result ───────────────────────────────────────────────────────────────
@@ -127,7 +133,7 @@ class WatchlistResult:
             "match_count": len(self.matches),
             "should_block": self.should_block,
             "should_warn": self.should_warn,
-            "highest_severity": self.highest_severity.value if self.highest_severity else None,
+            "highest_severity": self.highest_severity.value if self.highest_severity is not None else None,  # type: ignore[union-attr]
             "categories_triggered": self.categories_triggered,
             "matches": [m.to_dict() for m in self.matches],
         }
@@ -246,7 +252,7 @@ class KeywordWatchlist:
         )
         with self._lock:
             self._entries[entry_id] = entry
-        logger.info("📋 Watchlist entry added: %s (%s / %s)", entry_id, term[:30], mode.value)
+        logger.info("📋 Watchlist entry added: %s (%s / %s)", entry_id, term[:30], mode.value)  # type: ignore[index]
         return entry
 
     def remove(self, entry_id: str) -> bool:
