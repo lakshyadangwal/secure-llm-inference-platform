@@ -1976,6 +1976,178 @@ html.light .hex-stat-val { color: #006d99; }
 }
 #sound-toggle.muted { color: rgba(0,229,255,0.3); border-color: rgba(0,229,255,0.1); }
 html.light #sound-toggle { background: rgba(240,244,248,0.9); }
+/* ── CVE CARDS ── */
+.cve-section {
+  padding: 6rem 2rem;
+  border-top: 1px solid var(--border);
+}
+
+.cve-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.2rem;
+}
+@media(max-width:900px){ .cve-grid { grid-template-columns: repeat(2,1fr); } }
+@media(max-width:580px){ .cve-grid { grid-template-columns: 1fr; } }
+
+.cve-card {
+  background: rgba(0,0,0,0.35);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+.cve-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--border);
+  transition: background 0.3s;
+}
+.cve-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+  border-color: rgba(0,229,255,0.25);
+}
+.cve-card:hover::before { background: var(--cyan); }
+html.light .cve-card { background: rgba(255,255,255,0.95); border-color: rgba(0,150,180,0.15); }
+
+/* header row */
+.cve-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.cve-id {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  color: var(--cyan);
+  flex: 1;
+}
+html.light .cve-id { color: #006d99; }
+
+.cve-severity {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  padding: 0.18rem 0.55rem;
+  border-radius: 2px;
+}
+.cve-critical { background: rgba(255,45,85,0.15);  color: #ff2d55; border: 1px solid rgba(255,45,85,0.3); }
+.cve-high     { background: rgba(255,140,0,0.15);  color: #ff8c00; border: 1px solid rgba(255,140,0,0.3); }
+.cve-medium   { background: rgba(255,214,0,0.12);  color: #ffd600; border: 1px solid rgba(255,214,0,0.25); }
+.cve-low      { background: rgba(0,229,255,0.1);   color: #00e5ff; border: 1px solid rgba(0,229,255,0.25); }
+
+.cve-score {
+  font-family: 'Orbitron', monospace;
+  font-size: 1rem;
+  font-weight: 900;
+  color: #e8f4ff;
+  min-width: 2rem;
+  text-align: right;
+}
+html.light .cve-score { color: #0f172a; }
+
+/* title */
+.cve-title {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #e8f4ff;
+  line-height: 1.4;
+}
+html.light .cve-title { color: #060a14; }
+
+/* meta row */
+.cve-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+.cve-meta-item {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem;
+  color: #c8d8e4;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+html.light .cve-meta-item { color: #334155; }
+.cve-meta-label {
+  color: rgba(0,229,255,0.5);
+  letter-spacing: 0.1em;
+}
+html.light .cve-meta-label { color: #006d99; }
+
+/* description */
+.cve-desc {
+  font-size: 0.82rem;
+  color: #c8d8e4;
+  line-height: 1.6;
+  flex: 1;
+}
+html.light .cve-desc { color: #1e293b; }
+
+/* footer */
+.cve-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--border);
+  margin-top: auto;
+}
+html.light .cve-footer { border-color: rgba(0,150,180,0.15); }
+
+.cve-tags { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+.cve-tag {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.55rem;
+  letter-spacing: 0.08em;
+  padding: 0.15rem 0.45rem;
+  background: rgba(0,229,255,0.06);
+  border: 1px solid rgba(0,229,255,0.15);
+  border-radius: 2px;
+  color: rgba(0,229,255,0.7);
+}
+html.light .cve-tag { color: #006d99; background: rgba(0,109,153,0.06); border-color: rgba(0,109,153,0.2); }
+
+.cve-status {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.12em;
+  white-space: nowrap;
+  font-weight: 700;
+}
+.cve-status-patched { color: var(--green); }
+.cve-status-monitor { color: #ffa500; }
+.cve-status-open    { color: var(--red); }
+
+/* score color by severity */
+.cve-card:has(.cve-critical) .cve-score { color: #ff2d55; }
+.cve-card:has(.cve-high)     .cve-score { color: #ff8c00; }
+.cve-card:has(.cve-medium)   .cve-score { color: #ffd600; }
+
+/* stagger reveal */
+.cve-grid .cve-card:nth-child(1) { transition-delay: 0.0s; }
+.cve-grid .cve-card:nth-child(2) { transition-delay: 0.1s; }
+.cve-grid .cve-card:nth-child(3) { transition-delay: 0.2s; }
+.cve-grid .cve-card:nth-child(4) { transition-delay: 0.3s; }
+.cve-grid .cve-card:nth-child(5) { transition-delay: 0.4s; }
+.cve-grid .cve-card:nth-child(6) { transition-delay: 0.5s; }
+
 /* ── PROMPT INJECTION DETECTOR ── */
 .detector-section {
   padding: 6rem 2rem;
@@ -2591,6 +2763,159 @@ html.light .det-ex-btn:hover { color: #006d99; background: rgba(0,109,153,0.1); 
   </section>
 
   <!-- ── CTA ── -->
+  <!-- ── CVE CARDS ── -->
+  <section class="cve-section">
+    <div class="reveal" style="max-width:1100px;margin:0 auto;">
+      <div class="section-label">Vulnerability Database</div>
+      <h2 class="section-title">Known LLM Vulnerabilities</h2>
+      <p class="section-desc" style="margin-bottom:2.5rem;">NEURO-SENTRY actively defends against these documented attack classes. Each entry follows standard CVE disclosure format.</p>
+
+      <div class="cve-grid">
+
+        <!-- CVE 1 -->
+        <div class="cve-card reveal">
+          <div class="cve-card-header">
+            <span class="cve-id">NS-2024-0001</span>
+            <span class="cve-severity cve-critical">CRITICAL</span>
+            <span class="cve-score">9.8</span>
+          </div>
+          <div class="cve-title">Direct Prompt Injection via Instruction Override</div>
+          <div class="cve-meta">
+            <span class="cve-meta-item"><span class="cve-meta-label">VECTOR</span> User Input</span>
+            <span class="cve-meta-item"><span class="cve-meta-label">MODEL</span> All LLMs</span>
+            <span class="cve-meta-item"><span class="cve-meta-label">PUBLISHED</span> 2024-03-12</span>
+          </div>
+          <div class="cve-desc">Attacker embeds override instructions inside user prompt causing model to ignore system-level constraints. Exploits the inability of current LLMs to distinguish between instruction and data planes.</div>
+          <div class="cve-footer">
+            <div class="cve-tags">
+              <span class="cve-tag">Prompt Injection</span>
+              <span class="cve-tag">Alignment Bypass</span>
+            </div>
+            <span class="cve-status cve-status-patched">● DEFENDED</span>
+          </div>
+        </div>
+
+        <!-- CVE 2 -->
+        <div class="cve-card reveal">
+          <div class="cve-card-header">
+            <span class="cve-id">NS-2024-0002</span>
+            <span class="cve-severity cve-critical">CRITICAL</span>
+            <span class="cve-score">9.4</span>
+          </div>
+          <div class="cve-title">DAN Persona Jailbreak — Role Confusion Attack</div>
+          <div class="cve-meta">
+            <span class="cve-meta-item"><span class="cve-meta-label">VECTOR</span> Role Injection</span>
+            <span class="cve-meta-item"><span class="cve-meta-label">MODEL</span> GPT-4, Llama3</span>
+            <span class="cve-meta-item"><span class="cve-meta-label">PUBLISHED</span> 2024-01-08</span>
+          </div>
+          <div class="cve-desc">Attacker assigns an unrestricted alternate persona ("DAN", "STAN", "AIM") causing the model to roleplay as an AI with no safety guidelines, effectively bypassing all alignment training.</div>
+          <div class="cve-footer">
+            <div class="cve-tags">
+              <span class="cve-tag">Jailbreak</span>
+              <span class="cve-tag">Persona Injection</span>
+              <span class="cve-tag">Role Confusion</span>
+            </div>
+            <span class="cve-status cve-status-patched">● DEFENDED</span>
+          </div>
+        </div>
+
+        <!-- CVE 3 -->
+        <div class="cve-card reveal">
+          <div class="cve-card-header">
+            <span class="cve-id">NS-2024-0003</span>
+            <span class="cve-severity cve-high">HIGH</span>
+            <span class="cve-score">8.7</span>
+          </div>
+          <div class="cve-title">Indirect Prompt Injection via External Content</div>
+          <div class="cve-meta">
+            <span class="cve-meta-item"><span class="cve-meta-label">VECTOR</span> External Data</span>
+            <span class="cve-meta-item"><span class="cve-meta-label">MODEL</span> RAG Systems</span>
+            <span class="cve-meta-item"><span class="cve-meta-label">PUBLISHED</span> 2024-05-21</span>
+          </div>
+          <div class="cve-desc">Malicious instructions embedded in external content (web pages, documents, emails) are retrieved by RAG pipeline and injected into model context, hijacking agent behavior without direct user interaction.</div>
+          <div class="cve-footer">
+            <div class="cve-tags">
+              <span class="cve-tag">Indirect Injection</span>
+              <span class="cve-tag">RAG Exploit</span>
+            </div>
+            <span class="cve-status cve-status-monitor">● MONITORED</span>
+          </div>
+        </div>
+
+        <!-- CVE 4 -->
+        <div class="cve-card reveal">
+          <div class="cve-card-header">
+            <span class="cve-id">NS-2024-0004</span>
+            <span class="cve-severity cve-high">HIGH</span>
+            <span class="cve-score">8.1</span>
+          </div>
+          <div class="cve-title">Many-Shot Jailbreaking via Context Saturation</div>
+          <div class="cve-meta">
+            <span class="cve-meta-item"><span class="cve-meta-label">VECTOR</span> Context Window</span>
+            <span class="cve-meta-item"><span class="cve-meta-label">MODEL</span> Long-context LLMs</span>
+            <span class="cve-meta-item"><span class="cve-meta-label">PUBLISHED</span> 2024-04-03</span>
+          </div>
+          <div class="cve-desc">Attacker floods context window with hundreds of fake Q&A examples demonstrating the model answering harmful requests, exploiting in-context learning to override safety training at scale.</div>
+          <div class="cve-footer">
+            <div class="cve-tags">
+              <span class="cve-tag">Many-Shot</span>
+              <span class="cve-tag">Context Exploit</span>
+            </div>
+            <span class="cve-status cve-status-patched">● DEFENDED</span>
+          </div>
+        </div>
+
+        <!-- CVE 5 -->
+        <div class="cve-card reveal">
+          <div class="cve-card-header">
+            <span class="cve-id">NS-2024-0005</span>
+            <span class="cve-severity cve-medium">MEDIUM</span>
+            <span class="cve-score">6.5</span>
+          </div>
+          <div class="cve-title">Encoding Evasion — Base64 / Token Smuggling</div>
+          <div class="cve-meta">
+            <span class="cve-meta-item"><span class="cve-meta-label">VECTOR</span> Input Encoding</span>
+            <span class="cve-meta-item"><span class="cve-meta-label">MODEL</span> GPT-3.5+</span>
+            <span class="cve-meta-item"><span class="cve-meta-label">PUBLISHED</span> 2024-02-17</span>
+          </div>
+          <div class="cve-desc">Harmful instructions encoded in Base64, ROT13, hex, or split across tokens to evade keyword-based filters. Model decodes and executes instructions that would otherwise be blocked at input layer.</div>
+          <div class="cve-footer">
+            <div class="cve-tags">
+              <span class="cve-tag">Encoding</span>
+              <span class="cve-tag">Filter Evasion</span>
+              <span class="cve-tag">Token Smuggling</span>
+            </div>
+            <span class="cve-status cve-status-monitor">● MONITORED</span>
+          </div>
+        </div>
+
+        <!-- CVE 6 -->
+        <div class="cve-card reveal">
+          <div class="cve-card-header">
+            <span class="cve-id">NS-2024-0006</span>
+            <span class="cve-severity cve-medium">MEDIUM</span>
+            <span class="cve-score">6.2</span>
+          </div>
+          <div class="cve-title">Social Engineering via Authority Impersonation</div>
+          <div class="cve-meta">
+            <span class="cve-meta-item"><span class="cve-meta-label">VECTOR</span> Social Eng.</span>
+            <span class="cve-meta-item"><span class="cve-meta-label">MODEL</span> All LLMs</span>
+            <span class="cve-meta-item"><span class="cve-meta-label">PUBLISHED</span> 2024-06-09</span>
+          </div>
+          <div class="cve-desc">Attacker claims false authority (researcher, doctor, developer) or fictional framing to lower model's safety threshold. Exploits model's tendency to comply with perceived legitimate authority figures.</div>
+          <div class="cve-footer">
+            <div class="cve-tags">
+              <span class="cve-tag">Social Engineering</span>
+              <span class="cve-tag">Authority Claim</span>
+            </div>
+            <span class="cve-status cve-status-patched">● DEFENDED</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
   <!-- ── LIVE THREAT COUNTER ── -->
   <section class="threat-counter-section">
     <div class="reveal" style="max-width:1100px;margin:0 auto;text-align:center;">
