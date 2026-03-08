@@ -1946,6 +1946,30 @@ html.light .tech-label-text { color: #334155; }
   0%,100% { opacity: 0.3; }
   50%     { opacity: 0.7; }
 }
+/* ── SOUND TOGGLE BUTTON ── */
+#sound-toggle {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 1.5rem;
+  z-index: 500;
+  width: 38px; height: 38px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: rgba(2,6,9,0.8);
+  color: var(--cyan);
+  font-size: 1rem;
+  display: flex; align-items: center; justify-content: center;
+  cursor: none;
+  backdrop-filter: blur(10px);
+  transition: all 0.2s;
+}
+#sound-toggle:hover {
+  border-color: var(--cyan);
+  box-shadow: 0 0 14px rgba(0,229,255,0.3);
+  transform: scale(1.1);
+}
+#sound-toggle.muted { color: rgba(0,229,255,0.3); border-color: rgba(0,229,255,0.1); }
+html.light #sound-toggle { background: rgba(240,244,248,0.9); }
 </style>
 </head>
 <body>
@@ -1969,6 +1993,9 @@ html.light .tech-label-text { color: #334155; }
 
 <!-- hint -->
 <div id="konami-hint">↑↑↓↓←→←→BA</div>
+
+<!-- sound toggle -->
+<button id="sound-toggle" title="Toggle sound">🔊</button>
 
 <div class="page">
 
@@ -2567,6 +2594,9 @@ html.light .tech-label-text { color: #334155; }
     msg.style.opacity = '0';
     msg.style.animation = 'none';
 
+    // play power-up sound
+    if (window._soundEngine) window._soundEngine.konamiSound();
+
     // reset msg animation
     setTimeout(() => {
       msg.style.animation = '';
@@ -2991,6 +3021,174 @@ window.addEventListener('load', () => {
     });
   }, 800);
 });
+
+// ── CYBERPUNK SOUND ENGINE ──
+(function() {
+  let AudioCtx = window.AudioContext || window.webkitAudioContext;
+  let actx = null;
+  let soundEnabled = false; // off by default — user must enable
+
+  const btn = document.getElementById('sound-toggle');
+
+  function getCtx() {
+    if (!actx) actx = new AudioCtx();
+    return actx;
+  }
+
+  // ── sound primitives ──
+
+  function beep({ freq = 440, type = 'square', vol = 0.08, duration = 0.06, detune = 0 } = {}) {
+    if (!soundEnabled) return;
+    const ctx = getCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, ctx.currentTime);
+    osc.detune.setValueAtTime(detune, ctx.currentTime);
+    gain.gain.setValueAtTime(vol, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + duration);
+  }
+
+  function glitchNoise({ vol = 0.05, duration = 0.04 } = {}) {
+    if (!soundEnabled) return;
+    const ctx = getCtx();
+    const bufSize = ctx.sampleRate * duration;
+    const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < bufSize; i++) data[i] = (Math.random() * 2 - 1) * 0.3;
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(vol, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+    src.connect(gain);
+    gain.connect(ctx.destination);
+    src.start();
+  }
+
+  function sweepUp({ startFreq = 200, endFreq = 800, vol = 0.06, duration = 0.15 } = {}) {
+    if (!soundEnabled) return;
+    const ctx = getCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(startFreq, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(endFreq, ctx.currentTime + duration);
+    gain.gain.setValueAtTime(vol, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + duration + 0.01);
+  }
+
+  function sweepDown({ startFreq = 600, endFreq = 100, vol = 0.07, duration = 0.2 } = {}) {
+    if (!soundEnabled) return;
+    const ctx = getCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(startFreq, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(endFreq, ctx.currentTime + duration);
+    gain.gain.setValueAtTime(vol, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + duration + 0.01);
+  }
+
+  function konamiSound() {
+    if (!soundEnabled) return;
+    // dramatic power-up sequence
+    const notes = [220, 330, 440, 550, 660, 880];
+    notes.forEach((f, i) => {
+      setTimeout(() => beep({ freq: f, type: 'square', vol: 0.1, duration: 0.12 }), i * 80);
+    });
+    setTimeout(() => sweepUp({ startFreq: 400, endFreq: 1200, vol: 0.08, duration: 0.4 }), 500);
+  }
+
+  // ── bind sounds to page events ──
+
+  // nav links — subtle tick
+  document.querySelectorAll('.nav-links a').forEach(el => {
+    el.addEventListener('mouseenter', () => beep({ freq: 880, type: 'sine', vol: 0.04, duration: 0.04 }));
+  });
+
+  // buttons — sweep up on enter
+  document.querySelectorAll('.btn-primary, .nav-cta').forEach(el => {
+    el.addEventListener('mouseenter', () => sweepUp({ startFreq: 300, endFreq: 600, vol: 0.05, duration: 0.1 }));
+    el.addEventListener('click',      () => sweepUp({ startFreq: 500, endFreq: 1000, vol: 0.08, duration: 0.15 }));
+  });
+
+  // secondary buttons
+  document.querySelectorAll('.btn-secondary').forEach(el => {
+    el.addEventListener('mouseenter', () => beep({ freq: 440, type: 'triangle', vol: 0.04, duration: 0.08 }));
+    el.addEventListener('click',      () => beep({ freq: 660, type: 'triangle', vol: 0.07, duration: 0.1 }));
+  });
+
+  // feature cards — soft blip
+  document.querySelectorAll('.feature-card').forEach(el => {
+    el.addEventListener('mouseenter', () => beep({ freq: 660, type: 'sine', vol: 0.03, duration: 0.05 }));
+  });
+
+  // team cards — chord
+  document.querySelectorAll('.team-card').forEach((el, i) => {
+    const freqs = [523, 587, 659, 698]; // C D E F
+    el.addEventListener('mouseenter', () => {
+      beep({ freq: freqs[i % 4], type: 'sine', vol: 0.04, duration: 0.12 });
+      setTimeout(() => beep({ freq: freqs[i % 4] * 1.5, type: 'sine', vol: 0.02, duration: 0.1 }), 40);
+    });
+  });
+
+  // attack rows — glitch noise
+  document.querySelectorAll('.attack-row').forEach(el => {
+    el.addEventListener('mouseenter', () => glitchNoise({ vol: 0.04, duration: 0.03 }));
+  });
+
+  // social links — click beep
+  document.querySelectorAll('.team-social').forEach(el => {
+    el.addEventListener('click', () => sweepUp({ startFreq: 400, endFreq: 900, vol: 0.06, duration: 0.12 }));
+  });
+
+  // scroll — faint tick every 200px
+  let lastScrollSound = 0;
+  window.addEventListener('scroll', () => {
+    if (window.scrollY - lastScrollSound > 200) {
+      lastScrollSound = window.scrollY;
+      beep({ freq: 220, type: 'sine', vol: 0.02, duration: 0.03 });
+    }
+  });
+
+  // theme toggle — mode switch sound
+  document.getElementById('themeToggle')?.addEventListener('click', () => {
+    sweepDown({ startFreq: 800, endFreq: 200, vol: 0.06, duration: 0.2 });
+  });
+
+  // konami — power up
+  const origKonami = window._konamiCallback;
+  document.addEventListener('keydown', e => {
+    if (e.key === 'a' && window._konamiArmed) konamiSound();
+  });
+
+  // ── sound toggle button ──
+  btn.addEventListener('click', () => {
+    soundEnabled = !soundEnabled;
+    btn.textContent = soundEnabled ? '🔊' : '🔇';
+    btn.classList.toggle('muted', !soundEnabled);
+    if (soundEnabled) {
+      getCtx(); // unlock audio context
+      sweepUp({ startFreq: 200, endFreq: 600, vol: 0.06, duration: 0.15 });
+    }
+  });
+
+  // expose for konami
+  window._soundEngine = { konamiSound, sweepUp, sweepDown, beep, glitchNoise, isEnabled: () => soundEnabled };
+})();
 
 // ── MOUSE PARALLAX on hero ──
 document.addEventListener('mousemove', (e) => {
