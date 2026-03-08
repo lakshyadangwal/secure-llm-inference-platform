@@ -1015,6 +1015,53 @@ html.light .feed-track { color: #0f172a; }
 }
 .cta-cmd span { color: var(--green); }
 
+.cta-cmd-row {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.copy-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.75rem;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  color: var(--cyan);
+  background: rgba(0,229,255,0.05);
+  border: 1px solid rgba(0,229,255,0.25);
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.copy-btn:hover {
+  background: rgba(0,229,255,0.12);
+  border-color: var(--cyan);
+  box-shadow: 0 0 12px rgba(0,229,255,0.2);
+  transform: translateY(-1px);
+}
+.copy-btn.copied {
+  color: var(--green);
+  background: rgba(0,255,136,0.08);
+  border-color: rgba(0,255,136,0.4);
+  box-shadow: 0 0 16px rgba(0,255,136,0.2);
+}
+html.light .copy-btn { color: #006d99; border-color: rgba(0,109,153,0.3); background: rgba(0,109,153,0.05); }
+html.light .copy-btn.copied { color: #166534; border-color: rgba(22,101,52,0.4); background: rgba(22,101,52,0.06); }
+
+@keyframes copyPop {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.12); }
+  100% { transform: scale(1); }
+}
+.copy-btn.copied { animation: copyPop 0.3s ease; }
+
 /* ── FOOTER ── */
 footer {
   border-top: 1px solid var(--border);
@@ -2324,7 +2371,18 @@ html.light #sound-toggle { background: rgba(240,244,248,0.9); }
       <p class="cta-sub">Run locally. No cloud. No data leaves your machine. Full control over every prompt, every response, every breach.</p>
 
       <div class="cta-box">
-        <span class="cta-cmd"><span>$</span> git clone neuro-sentry && ./start-all.sh</span>
+        <div class="cta-cmd-row">
+          <span class="cta-cmd"><span>$</span> git clone neuro-sentry && ./start-all.sh</span>
+          <button class="copy-btn" id="copyBtn" onclick="copyClone()" title="Copy to clipboard">
+            <svg class="copy-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+            </svg>
+            <svg class="check-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:none">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            <span class="copy-label">COPY</span>
+          </button>
+        </div>
         <a href="#" class="btn-primary" style="margin-top:0.5rem">
           ⬡ &nbsp;Open Dashboard
         </a>
@@ -2629,6 +2687,47 @@ window.addEventListener('scroll', () => {
   const pct = window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100;
   scrollBar.style.width = pct + '%';
 });
+
+// ── COPY GIT CLONE ──
+function copyClone() {
+  const text = 'git clone neuro-sentry && ./start-all.sh';
+  const btn  = document.getElementById('copyBtn');
+  const copyIcon  = btn.querySelector('.copy-icon');
+  const checkIcon = btn.querySelector('.check-icon');
+  const label     = btn.querySelector('.copy-label');
+
+  navigator.clipboard.writeText(text).then(() => {
+    // swap icon + label
+    copyIcon.style.display  = 'none';
+    checkIcon.style.display = 'block';
+    label.textContent = 'COPIED!';
+    btn.classList.add('copied');
+
+    // play sound
+    if (window._soundEngine) window._soundEngine.sweepUp({ startFreq: 400, endFreq: 900, vol: 0.06, duration: 0.15 });
+
+    // reset after 2.5s
+    setTimeout(() => {
+      copyIcon.style.display  = 'block';
+      checkIcon.style.display = 'none';
+      label.textContent = 'COPY';
+      btn.classList.remove('copied');
+    }, 2500);
+  }).catch(() => {
+    // fallback for older browsers
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity  = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    label.textContent = 'COPIED!';
+    btn.classList.add('copied');
+    setTimeout(() => { label.textContent = 'COPY'; btn.classList.remove('copied'); }, 2500);
+  });
+}
 
 // ── MOUSE TILT on feature cards ──
 document.querySelectorAll('.feature-card').forEach(card => {
