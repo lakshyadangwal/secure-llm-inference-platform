@@ -1,6 +1,5 @@
 """
 Commit 42: Threat Intelligence Route
-======================================
 Endpoints that surface threat intelligence data across all defense modules.
 
 Endpoints:

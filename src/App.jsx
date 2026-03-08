@@ -14,6 +14,14 @@ import RedTeamFuzzer from './components/RedTeamFuzzer';
 import ThreatMap from './components/ThreatMap';
 import RagScanner from './components/RagScanner';
 import IndexPage from './components/IndexPage';
+import AppPlayground from './components/playground/Playground';
+import AnalyticsDashboard from './components/analytics/AnalyticsDashboard';
+import AuditLogs from './components/audit/AuditLogs';
+import ThreatIntelBoard from './components/security/ThreatIntelBoard';
+import PiiSettings from './components/security/PiiSettings';
+import ProjectList from './components/projects/ProjectList';
+import SettingsLayout from './components/settings/SettingsLayout';
+import Quotas from './components/quotas/Quotas';
 import { attackScenarios } from './data/attackScenarios';
 import { sendPrompt, getSystemStats } from './services/api';
 
@@ -167,19 +175,35 @@ function AppInner() {
         <main className="flex-1 flex flex-col min-w-0">
           {/* Tab bar */}
           <div className="flex flex-wrap items-center gap-2 px-8 py-4 border-b border-[var(--border-primary)] bg-[var(--card-bg)] flex-shrink-0 relative z-30 shadow-md">
-            {['dashboard', 'map', 'rules', 'fuzzer', 'rag', 'lab', 'chat'].map((view) => {
+            {['dashboard', 'analytics', 'audit', 'threats', 'dlp', 'map', 'rules', 'fuzzer', 'rag', 'projects', 'quotas', 'playground', 'lab', 'chat', 'settings'].map((view) => {
               const labels = {
                 dashboard: 'Overview',
+                analytics: 'Analytics',
+                audit: 'Audit Logs',
+                threats: 'Threat Intel',
+                dlp: 'DLP Setup',
+                projects: 'Workspaces',
+                quotas: 'Billing',
+                settings: 'Settings',
                 map: 'Threat Map',
                 rules: 'Rule Engine',
                 fuzzer: 'Auto Fuzzer',
                 rag: 'RAG Scanner',
+                playground: 'AI Playground',
                 lab: 'Attack Lab',
                 chat: 'Neural Link',
               };
               const icons = {
                 dashboard: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />,
+                analytics: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />,
+                audit: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />,
+                threats: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />,
+                dlp: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />,
+                projects: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />,
+                quotas: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />,
+                settings: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />,
                 lab: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />,
+                playground: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />,
                 chat: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />,
               };
               return (
@@ -211,6 +235,20 @@ function AppInner() {
             <AnimatePresence mode="wait">
               {activeView === 'dashboard' ? (
                 <Dashboard key="dashboard" isDefending={isDefending} isProcessing={isProcessing} isBreached={isBreached} stats={stats} />
+              ) : activeView === 'analytics' ? (
+                <AnalyticsDashboard key="analytics" />
+              ) : activeView === 'audit' ? (
+                <AuditLogs key="audit" />
+              ) : activeView === 'threats' ? (
+                <ThreatIntelBoard key="threats" />
+              ) : activeView === 'dlp' ? (
+                <PiiSettings key="dlp" />
+              ) : activeView === 'projects' ? (
+                <ProjectList key="projects" />
+              ) : activeView === 'quotas' ? (
+                <Quotas key="quotas" />
+              ) : activeView === 'settings' ? (
+                <SettingsLayout key="settings" />
               ) : activeView === 'map' ? (
                 <ThreatMap key="map" />
               ) : activeView === 'rules' ? (
@@ -219,6 +257,8 @@ function AppInner() {
                 <RedTeamFuzzer key="fuzzer" />
               ) : activeView === 'rag' ? (
                 <RagScanner key="rag" />
+              ) : activeView === 'playground' ? (
+                <AppPlayground key="playground" />
               ) : activeView === 'chat' ? (
                 user ? (
                   <DirectChat key="chat" backendConnected={backendConnected} />
