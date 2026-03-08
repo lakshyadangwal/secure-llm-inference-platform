@@ -1946,6 +1946,55 @@ html.light .tech-label-text { color: #334155; }
   0%,100% { opacity: 0.3; }
   50%     { opacity: 0.7; }
 }
+/* ── HEX GRID SECTION ── */
+.hex-section {
+  padding: 6rem 2rem;
+  position: relative;
+  border-top: 1px solid var(--border);
+}
+
+.hex-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+  background: rgba(0,0,0,0.3);
+}
+html.light .hex-wrapper { background: rgba(255,255,255,0.6); }
+
+#hex-canvas {
+  display: block;
+  width: 100%;
+  height: 420px;
+  cursor: none;
+}
+
+.hex-status-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.2rem;
+  padding: 0.7rem 1.5rem;
+  background: rgba(0,0,0,0.4);
+  border-top: 1px solid var(--border);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  color: #c8d8e4;
+}
+html.light .hex-status-bar { background: rgba(240,244,248,0.9); color: #334155; }
+
+.hex-stat-val {
+  color: var(--cyan);
+  font-weight: 700;
+}
+html.light .hex-stat-val { color: #006d99; }
+
+.hex-divider { color: var(--border); }
+
 /* ── SOUND TOGGLE BUTTON ── */
 #sound-toggle {
   position: fixed;
@@ -2372,6 +2421,25 @@ html.light #sound-toggle { background: rgba(240,244,248,0.9); }
         <a href="#" class="btn-primary" style="margin-top:0.5rem">
           ⬡ &nbsp;Open Dashboard
         </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── HEX GRID ── -->
+  <section class="hex-section">
+    <div class="reveal" style="max-width:1100px;margin:0 auto;text-align:center;">
+      <div class="section-label">Defense Matrix</div>
+      <h2 class="section-title">Neural Grid Interface</h2>
+      <p class="section-desc" style="margin-bottom:2.5rem;">Move your cursor across the matrix. Each node represents a defense layer — hover to activate, click to probe.</p>
+      <div class="hex-wrapper">
+        <canvas id="hex-canvas"></canvas>
+        <div class="hex-status-bar">
+          <span class="hex-stat"><span class="hex-stat-val" id="hex-active">0</span> NODES ACTIVE</span>
+          <span class="hex-divider">|</span>
+          <span class="hex-stat"><span class="hex-stat-val" id="hex-threat">SCANNING</span></span>
+          <span class="hex-divider">|</span>
+          <span class="hex-stat">GRID <span class="hex-stat-val" id="hex-pct">0%</span> SECURED</span>
+        </div>
       </div>
     </div>
   </section>
@@ -3021,6 +3089,265 @@ window.addEventListener('load', () => {
     });
   }, 800);
 });
+
+// ── HEX GRID INTERACTIVE ──
+(function() {
+  const canvas = document.getElementById('hex-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+
+  const SIZE = 28;       // hex radius
+  const GAP  = 3;
+  const W_HEX = SIZE * 2;
+  const H_HEX = Math.sqrt(3) * SIZE;
+
+  let W, H, hexes = [], mouseX = -999, mouseY = -999;
+
+  // threat labels for clicked hexes
+  const LABELS = [
+    'SECURE','ACTIVE','SCANNING','BREACH?','LOCKED',
+    'PATROL','MONITOR','ALERT','ONLINE','ARMED',
+    'NEURAL','GUARD','PROXY','SHIELD','DETECT'
+  ];
+
+  const COLORS = {
+    idle:    { fill: 'rgba(0,229,255,0.03)',  stroke: 'rgba(0,229,255,0.12)' },
+    hover:   { fill: 'rgba(0,229,255,0.12)',  stroke: 'rgba(0,229,255,0.7)'  },
+    hot:     { fill: 'rgba(0,229,255,0.22)',  stroke: 'rgba(0,229,255,1)'    },
+    active:  { fill: 'rgba(0,255,136,0.12)',  stroke: 'rgba(0,255,136,0.8)'  },
+    alert:   { fill: 'rgba(255,45,85,0.15)',  stroke: 'rgba(255,45,85,0.9)'  },
+    purple:  { fill: 'rgba(139,92,246,0.12)', stroke: 'rgba(139,92,246,0.8)' },
+  };
+
+  function hexPath(cx, cy, r) {
+    ctx.beginPath();
+    for (let i = 0; i < 6; i++) {
+      const angle = Math.PI / 180 * (60 * i - 30);
+      const x = cx + r * Math.cos(angle);
+      const y = cy + r * Math.sin(angle);
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+  }
+
+  function dist(ax, ay, bx, by) {
+    return Math.sqrt((ax - bx) ** 2 + (ay - by) ** 2);
+  }
+
+  function buildGrid() {
+    W = canvas.offsetWidth;
+    H = 420;
+    canvas.width  = W;
+    canvas.height = H;
+    hexes = [];
+
+    const cols = Math.ceil(W  / (W_HEX * 0.75)) + 1;
+    const rows = Math.ceil(H  / H_HEX) + 1;
+
+    for (let col = 0; col < cols; col++) {
+      for (let row = 0; row < rows; row++) {
+        const cx = col * W_HEX * 0.75 + SIZE;
+        const cy = row * H_HEX + (col % 2 === 0 ? 0 : H_HEX / 2) + H_HEX / 2;
+        if (cx > W + SIZE || cy > H + SIZE) continue;
+
+        hexes.push({
+          cx, cy,
+          state: 'idle',
+          glow: 0,
+          label: null,
+          labelAlpha: 0,
+          pulse: Math.random() * Math.PI * 2,
+          pulseSpeed: 0.015 + Math.random() * 0.02,
+          clickTime: 0,
+          colorKey: 'idle',
+        });
+      }
+    }
+
+    // randomly pre-activate some hexes
+    hexes.forEach(h => {
+      if (Math.random() < 0.06) {
+        h.colorKey = 'active';
+        h.glow = 0.4 + Math.random() * 0.4;
+        h.label = LABELS[Math.floor(Math.random() * LABELS.length)];
+        h.labelAlpha = 0.7;
+      } else if (Math.random() < 0.02) {
+        h.colorKey = 'alert';
+        h.glow = 0.5;
+        h.label = 'BREACH?';
+        h.labelAlpha = 0.8;
+      }
+    });
+  }
+
+  function updateStats() {
+    const active = hexes.filter(h => h.colorKey !== 'idle').length;
+    const pct    = Math.round(active / hexes.length * 100);
+    const el1 = document.getElementById('hex-active');
+    const el2 = document.getElementById('hex-pct');
+    const el3 = document.getElementById('hex-threat');
+    if (el1) el1.textContent = active;
+    if (el2) el2.textContent = pct + '%';
+    if (el3) {
+      const alertCount = hexes.filter(h => h.colorKey === 'alert').length;
+      el3.textContent = alertCount > 0 ? `⚠ ${alertCount} ALERTS` : 'NOMINAL';
+      el3.style.color = alertCount > 0 ? 'var(--red)' : 'var(--cyan)';
+    }
+  }
+
+  function drawFrame() {
+    ctx.clearRect(0, 0, W, H);
+
+    // subtle radial glow at mouse
+    const grd = ctx.createRadialGradient(mouseX, mouseY, 0, mouseX, mouseY, 140);
+    grd.addColorStop(0, 'rgba(0,229,255,0.06)');
+    grd.addColorStop(1, 'transparent');
+    ctx.fillStyle = grd;
+    ctx.fillRect(0, 0, W, H);
+
+    hexes.forEach(h => {
+      h.pulse += h.pulseSpeed;
+      const d = dist(mouseX, mouseY, h.cx, h.cy);
+
+      // proximity glow
+      if (d < SIZE * 4) {
+        const proximity = 1 - d / (SIZE * 4);
+        h.glow = Math.min(1, h.glow + proximity * 0.08);
+        if (d < SIZE * 1.1 && h.colorKey === 'idle') h.colorKey = 'hover';
+      } else {
+        if (h.colorKey === 'hover') h.colorKey = 'idle';
+        if (h.colorKey !== 'active' && h.colorKey !== 'alert' && h.colorKey !== 'purple') {
+          h.glow = Math.max(0, h.glow - 0.03);
+        }
+      }
+
+      const col = COLORS[h.colorKey] || COLORS.idle;
+      const pulse = 0.5 + 0.5 * Math.sin(h.pulse);
+
+      // fill
+      hexPath(h.cx, h.cy, SIZE - GAP);
+      ctx.fillStyle = col.fill;
+      ctx.fill();
+
+      // stroke
+      ctx.lineWidth = h.colorKey === 'idle' ? 0.5 : 1.5;
+      const strokeAlpha = h.colorKey === 'idle'
+        ? 0.08 + pulse * 0.04
+        : 0.6 + pulse * 0.3;
+      ctx.strokeStyle = col.stroke.replace(/[\d.]+\)$/, `${strokeAlpha})`);
+      ctx.stroke();
+
+      // glow effect
+      if (h.glow > 0.05) {
+        hexPath(h.cx, h.cy, SIZE - GAP + 3);
+        ctx.shadowColor = col.stroke;
+        ctx.shadowBlur  = 12 * h.glow;
+        ctx.strokeStyle = col.stroke.replace(/[\d.]+\)$/, `${h.glow * 0.5})`);
+        ctx.lineWidth = 1;
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+      }
+
+      // label
+      if (h.label && h.labelAlpha > 0.05) {
+        ctx.font = `bold 7px "Share Tech Mono", monospace`;
+        ctx.fillStyle = col.stroke.replace(/[\d.]+\)$/, `${h.labelAlpha})`);
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(h.label, h.cx, h.cy);
+      }
+
+      // center dot
+      if (h.colorKey !== 'idle') {
+        ctx.beginPath();
+        ctx.arc(h.cx, h.cy, 2, 0, Math.PI * 2);
+        ctx.fillStyle = col.stroke;
+        ctx.fill();
+      }
+    });
+
+    // ripple effect on clicked hexes
+    const now = Date.now();
+    hexes.forEach(h => {
+      if (h.clickTime > 0) {
+        const elapsed = (now - h.clickTime) / 1000;
+        if (elapsed < 0.6) {
+          const r = (SIZE + elapsed * SIZE * 3);
+          const alpha = Math.max(0, 0.6 - elapsed);
+          hexPath(h.cx, h.cy, r);
+          ctx.strokeStyle = `rgba(0,229,255,${alpha})`;
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+        } else {
+          h.clickTime = 0;
+        }
+      }
+    });
+
+    requestAnimationFrame(drawFrame);
+  }
+
+  // mouse tracking
+  canvas.addEventListener('mousemove', e => {
+    const r = canvas.getBoundingClientRect();
+    mouseX = (e.clientX - r.left) * (canvas.width / r.width);
+    mouseY = (e.clientY - r.top)  * (canvas.height / r.height);
+  });
+  canvas.addEventListener('mouseleave', () => { mouseX = -999; mouseY = -999; });
+
+  // click — activate hex
+  canvas.addEventListener('click', e => {
+    const r = canvas.getBoundingClientRect();
+    const cx = (e.clientX - r.left) * (canvas.width / r.width);
+    const cy = (e.clientY - r.top)  * (canvas.height / r.height);
+
+    let closest = null, minD = SIZE * 1.2;
+    hexes.forEach(h => {
+      const d = dist(cx, cy, h.cx, h.cy);
+      if (d < minD) { minD = d; closest = h; }
+    });
+
+    if (closest) {
+      closest.clickTime = Date.now();
+      // cycle through states
+      const cycle = ['idle','active','purple','alert','idle'];
+      const idx = cycle.indexOf(closest.colorKey);
+      closest.colorKey = cycle[(idx + 1) % cycle.length];
+      closest.glow = 0.8;
+      closest.label = closest.colorKey !== 'idle'
+        ? LABELS[Math.floor(Math.random() * LABELS.length)]
+        : null;
+      closest.labelAlpha = 0.9;
+
+      // play sound
+      if (window._soundEngine) {
+        const freqs = { active: 660, purple: 550, alert: 330, idle: 220 };
+        window._soundEngine.beep({ freq: freqs[closest.colorKey] || 440, type: 'sine', vol: 0.05, duration: 0.08 });
+      }
+    }
+    updateStats();
+  });
+
+  // random drift — occasionally flip a hex state
+  setInterval(() => {
+    const h = hexes[Math.floor(Math.random() * hexes.length)];
+    if (h && h.colorKey === 'idle' && Math.random() < 0.3) {
+      h.colorKey = Math.random() < 0.8 ? 'active' : 'alert';
+      h.glow = 0.5;
+      h.label = LABELS[Math.floor(Math.random() * LABELS.length)];
+      h.labelAlpha = 0.8;
+      setTimeout(() => {
+        if (h.colorKey !== 'purple') { h.colorKey = 'idle'; h.label = null; h.glow = 0; }
+      }, 2000 + Math.random() * 3000);
+    }
+    updateStats();
+  }, 800);
+
+  window.addEventListener('resize', buildGrid);
+  buildGrid();
+  drawFrame();
+  updateStats();
+})();
 
 // ── CYBERPUNK SOUND ENGINE ──
 (function() {
