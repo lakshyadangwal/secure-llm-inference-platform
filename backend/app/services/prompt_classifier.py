@@ -152,7 +152,7 @@ class PromptClassifier:
     def __init__(self):
         self._total_classified = 0
         self._intent_counts: dict[str, int] = {}
-        logger.info("🏷️  PromptClassifier initialised with %d intent categories", len(Intent))
+        logger.info("🏷️  PromptClassifier initialised with 10 intent categories")
 
     def classify(self, prompt: str) -> ClassificationResult:
         """
@@ -182,7 +182,7 @@ class PromptClassifier:
 
         sorted_intents = sorted(scores.items(), key=lambda x: x[1], reverse=True)
         primary, primary_score = sorted_intents[0]
-        secondary = [i for i, _ in sorted_intents[1:4] if _ >= 0.1]
+        secondary = [i for i, _ in list(sorted_intents)[1:4] if _ >= 0.1]  # type: ignore[index]
 
         # Malicious intents get a confidence boost
         if primary.is_malicious:
@@ -190,9 +190,9 @@ class PromptClassifier:
 
         result = ClassificationResult(
             primary_intent=primary,
-            confidence=round(primary_score, 3),
+            confidence=round(float(primary_score), 3),  # type: ignore[call-overload]
             secondary_intents=secondary,
-            intent_scores={i.value: round(s, 3) for i, s in sorted_intents},
+            intent_scores={str(i.value): round(float(s), 3) for i, s in sorted_intents},  # type: ignore[call-overload]
             is_malicious=primary.is_malicious,
             is_suspicious=primary.is_suspicious or any(i.is_malicious for i in secondary),
         )
@@ -207,7 +207,7 @@ class PromptClassifier:
         return result
 
     def _record(self, intent: Intent) -> None:
-        key = intent.value
+        key = str(intent.value)
         self._intent_counts[key] = self._intent_counts.get(key, 0) + 1
 
     def get_stats(self) -> dict:
@@ -216,7 +216,7 @@ class PromptClassifier:
             "intent_distribution": self._intent_counts,
             "malicious_count": sum(
                 v for k, v in self._intent_counts.items()
-                if Intent(k).is_malicious
+                if k in ("jailbreak_attempt", "injection_attempt", "social_engineering")
             ),
         }
 

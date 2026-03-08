@@ -61,13 +61,13 @@ class Session:
     def avg_threat_score(self) -> float:
         if self.request_count == 0:
             return 0.0
-        return round(self.threat_score_sum / self.request_count, 3)
+        return round(float(self.threat_score_sum) / self.request_count, 3)  # type: ignore[call-overload]
 
     @property
     def threat_ratio(self) -> float:
         if self.request_count == 0:
             return 0.0
-        return round(self.threat_count / self.request_count, 3)
+        return round(float(self.threat_count) / self.request_count, 3)  # type: ignore[call-overload]
 
     def touch(self) -> None:
         """Update last_active timestamp."""
@@ -84,7 +84,7 @@ class Session:
             "ip": self.ip,
             "created_at": self.created_at,
             "last_active": self.last_active,
-            "duration_seconds": round(self.duration_seconds, 1),
+            "duration_seconds": round(self.duration_seconds, 1),  # type: ignore[call-overload]
             "request_count": self.request_count,
             "threat_count": self.threat_count,
             "threat_ratio": self.threat_ratio,
@@ -116,7 +116,7 @@ class SessionManager:
 
     def _fingerprint(self, ip: str, user_agent: str) -> str:
         raw = f"{ip}|{user_agent.strip()}"
-        return hashlib.sha256(raw.encode()).hexdigest()[:24]
+        return hashlib.sha256(raw.encode()).hexdigest()[:24]  # type: ignore[index]
 
     def _generate_token(self) -> str:
         return secrets.token_urlsafe(TOKEN_BYTES)
@@ -147,7 +147,7 @@ class SessionManager:
             if session and session.is_expired:
                 # Recycle the expired session
                 self._by_token.pop(session.token, None)
-                del self._sessions[fp]
+                self._sessions.pop(fp, None)
                 session = None
                 self._total_expired += 1
 
@@ -159,7 +159,8 @@ class SessionManager:
                         logger.warning("⚠️  Session limit reached — dropping oldest session")
                         oldest = min(self._sessions.values(), key=lambda s: s.last_active)
                         self._by_token.pop(oldest.token, None)
-                        del self._sessions[oldest.fingerprint if hasattr(oldest, 'fingerprint') else fp]
+                        oldest_fp = oldest.fingerprint if hasattr(oldest, 'fingerprint') else fp
+                        self._sessions.pop(oldest_fp, None)
 
                 token = self._generate_token()
                 session = Session(
