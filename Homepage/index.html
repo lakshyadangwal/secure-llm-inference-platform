@@ -135,6 +135,17 @@ body {
   pointer-events: none;
 }
 
+/* ── MATRIX RAIN CANVAS ── */
+#matrix-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.18;
+  transition: opacity 1s ease;
+}
+html.light #matrix-canvas { opacity: 0.06; }
+
 /* ── SCANLINES ── */
 body::after {
   content: '';
@@ -1940,6 +1951,7 @@ html.light .tech-label-text { color: #334155; }
 <body>
 
 <canvas id="bg-canvas"></canvas>
+<canvas id="matrix-canvas"></canvas>
 <div id="scroll-progress"></div>
 <div id="cursor-glow"></div>
 <div id="cursor-dot"></div>
@@ -2863,6 +2875,73 @@ window.addEventListener('resize', () => { resize(); initNodes(); });
 resize();
 initNodes();
 draw();
+
+// ── MATRIX RAIN BACKGROUND ──
+(function() {
+  const mc  = document.getElementById('matrix-canvas');
+  const ctx = mc.getContext('2d');
+
+  let W, H, cols, drops, speeds, opacities;
+
+  // character set: binary + katakana + hex + neuro-sentry themed
+  const CHARS = '01アイウエオカキクケコサシスセソタチツテトナニヌネノ<>{}[]01ABCDEF∑∆πΩ神経哨兵'.split('');
+  const FONT_SIZE = 13;
+
+  function init() {
+    W = mc.width  = window.innerWidth;
+    H = mc.height = window.innerHeight;
+    cols      = Math.floor(W / FONT_SIZE);
+    drops     = Array.from({ length: cols }, () => Math.random() * -H / FONT_SIZE);
+    speeds    = Array.from({ length: cols }, () => 0.3 + Math.random() * 0.7);
+    opacities = Array.from({ length: cols }, () => 0.3 + Math.random() * 0.7);
+  }
+
+  function drawMatrix() {
+    // fade trail
+    ctx.fillStyle = 'rgba(2,6,9,0.045)';
+    ctx.fillRect(0, 0, W, H);
+
+    ctx.font = `${FONT_SIZE}px "Share Tech Mono", monospace`;
+
+    for (let i = 0; i < cols; i++) {
+      const ch  = CHARS[Math.floor(Math.random() * CHARS.length)];
+      const x   = i * FONT_SIZE;
+      const y   = drops[i] * FONT_SIZE;
+
+      // head char — bright cyan/white
+      if (Math.random() > 0.93) {
+        ctx.fillStyle = `rgba(200,255,240,0.9)`;
+      } else {
+        // body — cyan or green tint
+        const g = 180 + Math.floor(Math.random() * 75);
+        ctx.fillStyle = `rgba(0,${g},${g * 0.6 + 80},${opacities[i] * 0.7})`;
+      }
+
+      ctx.fillText(ch, x, y);
+
+      // reset column when it goes past bottom
+      if (y > H && Math.random() > 0.978) {
+        drops[i] = -Math.random() * 20;
+        speeds[i]    = 0.3 + Math.random() * 0.7;
+        opacities[i] = 0.3 + Math.random() * 0.7;
+      }
+
+      drops[i] += speeds[i];
+    }
+
+    requestAnimationFrame(drawMatrix);
+  }
+
+  window.addEventListener('resize', init);
+  init();
+  drawMatrix();
+
+  // dim on scroll — less distraction when reading content
+  window.addEventListener('scroll', () => {
+    const pct = window.scrollY / (document.body.scrollHeight - window.innerHeight);
+    mc.style.opacity = Math.max(0.04, 0.18 - pct * 0.16);
+  });
+})();
 
 // ── COUNTER ANIMATION ──
 function animateCounter(el, target, suffix = '', duration = 1500) {
