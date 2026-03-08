@@ -1851,6 +1851,90 @@ html.light .tech-label-text { color: #334155; }
   from { width: 0; }
   to   { width: 100%; }
 }
+/* ── KONAMI EASTER EGG ── */
+#konami-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+#konami-overlay.active { opacity: 1; pointer-events: all; }
+
+#konami-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%; height: 100%;
+}
+
+#konami-msg {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 10;
+  animation: konamiPop 0.5s 0.3s ease both;
+  opacity: 0;
+}
+@keyframes konamiPop {
+  0%   { opacity: 0; transform: translate(-50%,-50%) scale(0.5); }
+  70%  { transform: translate(-50%,-50%) scale(1.08); }
+  100% { opacity: 1; transform: translate(-50%,-50%) scale(1); }
+}
+
+#konami-title {
+  font-family: 'Orbitron', monospace;
+  font-size: clamp(2rem, 6vw, 5rem);
+  font-weight: 900;
+  color: #00ff88;
+  text-shadow: 0 0 30px #00ff88, 0 0 80px rgba(0,255,136,0.4);
+  letter-spacing: 0.1em;
+  line-height: 1.1;
+  margin-bottom: 1rem;
+}
+#konami-sub {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 1rem;
+  color: rgba(0,255,136,0.7);
+  letter-spacing: 0.2em;
+  margin-bottom: 2rem;
+}
+#konami-close {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  color: rgba(0,255,136,0.5);
+  border: 1px solid rgba(0,255,136,0.3);
+  background: rgba(0,255,136,0.05);
+  padding: 0.6rem 1.5rem;
+  cursor: none;
+  border-radius: 2px;
+  transition: all 0.2s;
+}
+#konami-close:hover {
+  background: rgba(0,255,136,0.15);
+  color: #00ff88;
+  box-shadow: 0 0 20px rgba(0,255,136,0.3);
+}
+
+/* konami hint pill */
+#konami-hint {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.15em;
+  color: rgba(0,229,255,0.2);
+  z-index: 200;
+  pointer-events: none;
+  animation: hintPulse 4s ease-in-out infinite;
+}
+@keyframes hintPulse {
+  0%,100% { opacity: 0.3; }
+  50%     { opacity: 0.7; }
+}
 </style>
 </head>
 <body>
@@ -1860,6 +1944,19 @@ html.light .tech-label-text { color: #334155; }
 <div id="cursor-glow"></div>
 <div id="cursor-dot"></div>
 <div id="cursor-ring"></div>
+
+<!-- KONAMI EASTER EGG -->
+<div id="konami-overlay">
+  <canvas id="konami-canvas"></canvas>
+  <div id="konami-msg">
+    <div id="konami-title">ACCESS<br/>GRANTED</div>
+    <div id="konami-sub">// NEURO-SENTRY GOD MODE UNLOCKED</div>
+    <button id="konami-close" onclick="document.getElementById('konami-overlay').classList.remove('active')">[ ESC ] RETURN TO MATRIX</button>
+  </div>
+</div>
+
+<!-- hint -->
+<div id="konami-hint">↑↑↓↓←→←→BA</div>
 
 <div class="page">
 
@@ -2415,6 +2512,97 @@ html.light .tech-label-text { color: #334155; }
       el.innerHTML = `<span class="feed-event-tag ${e.cls}">${e.tag}</span>${e.msg}`;
       track.appendChild(el);
     });
+  }
+})();
+
+// ── KONAMI CODE EASTER EGG ──
+(function() {
+  const CODE = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+  let pos = 0;
+
+  document.addEventListener('keydown', e => {
+    if (e.key === CODE[pos]) {
+      pos++;
+      if (pos === CODE.length) {
+        pos = 0;
+        triggerKonami();
+      }
+    } else {
+      pos = e.key === CODE[0] ? 1 : 0;
+    }
+  });
+
+  // close on ESC
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      document.getElementById('konami-overlay').classList.remove('active');
+      stopMatrix();
+    }
+  });
+
+  let matrixAnim = null;
+
+  function stopMatrix() {
+    if (matrixAnim) { cancelAnimationFrame(matrixAnim); matrixAnim = null; }
+  }
+
+  function triggerKonami() {
+    const overlay = document.getElementById('konami-overlay');
+    const canvas  = document.getElementById('konami-canvas');
+    const msg     = document.getElementById('konami-msg');
+
+    overlay.classList.add('active');
+    msg.style.opacity = '0';
+    msg.style.animation = 'none';
+
+    // reset msg animation
+    setTimeout(() => {
+      msg.style.animation = '';
+    }, 50);
+
+    // matrix rain
+    const ctx = canvas.getContext('2d');
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const cols   = Math.floor(canvas.width / 16);
+    const drops  = Array(cols).fill(1);
+    const chars  = 'NEURO-SENTRY神経哨兵01アイウエオカキクケコABCDEF<>{}[]∑∆πΩ'.split('');
+
+    stopMatrix();
+
+    function drawMatrix() {
+      ctx.fillStyle = 'rgba(0,0,0,0.05)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.font = '14px Share Tech Mono, monospace';
+
+      drops.forEach((y, i) => {
+        const ch = chars[Math.floor(Math.random() * chars.length)];
+        const x  = i * 16;
+
+        // head = bright white/green, tail fades
+        const brightness = Math.random() > 0.95 ? 1 : 0.6;
+        ctx.fillStyle = brightness === 1
+          ? `rgba(200,255,220,0.95)`
+          : `rgba(0,255,${100 + Math.floor(Math.random()*136)},0.7)`;
+
+        ctx.fillText(ch, x, y * 16);
+
+        if (y * 16 > canvas.height && Math.random() > 0.975) drops[i] = 0;
+        drops[i]++;
+      });
+
+      matrixAnim = requestAnimationFrame(drawMatrix);
+    }
+
+    drawMatrix();
+
+    // close after 8s automatically
+    setTimeout(() => {
+      overlay.classList.remove('active');
+      stopMatrix();
+    }, 8000);
   }
 })();
 
