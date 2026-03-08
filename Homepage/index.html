@@ -1976,6 +1976,28 @@ html.light .hex-stat-val { color: #006d99; }
 }
 #sound-toggle.muted { color: rgba(0,229,255,0.3); border-color: rgba(0,229,255,0.1); }
 html.light #sound-toggle { background: rgba(240,244,248,0.9); }
+/* ── THEME TRANSITION FLASH ── */
+#theme-flash {
+  position: fixed;
+  inset: 0;
+  z-index: 999998;
+  pointer-events: none;
+  opacity: 0;
+}
+@keyframes flashSweep {
+  0%   { opacity: 0;    clip-path: inset(0 100% 0 0); }
+  30%  { opacity: 1;    clip-path: inset(0 0% 0 0); }
+  70%  { opacity: 1;    clip-path: inset(0 0% 0 0); }
+  100% { opacity: 0;    clip-path: inset(0 0 0 100%); }
+}
+#theme-flash.flash-light {
+  background: rgba(255,255,255,0.92);
+  animation: flashSweep 0.45s ease forwards;
+}
+#theme-flash.flash-dark {
+  background: rgba(0,0,0,0.92);
+  animation: flashSweep 0.45s ease forwards;
+}
 </style>
 </head>
 <body>
@@ -1983,6 +2005,7 @@ html.light #sound-toggle { background: rgba(240,244,248,0.9); }
 <canvas id="bg-canvas"></canvas>
 <canvas id="matrix-canvas"></canvas>
 <div id="scroll-progress"></div>
+<div id="theme-flash"></div>
 
 <!-- KONAMI EASTER EGG -->
 <div id="konami-overlay">
@@ -2826,12 +2849,26 @@ document.querySelectorAll('.btn-primary, .btn-secondary, .nav-cta').forEach(btn 
 })();
 const themeBtn = document.getElementById('themeToggle');
 const html = document.documentElement;
+const themeFlash = document.getElementById('theme-flash');
 let isLight = false;
 
 themeBtn.addEventListener('click', () => {
   isLight = !isLight;
-  html.classList.toggle('light', isLight);
-  themeBtn.textContent = isLight ? '🌙' : '☀️';
+
+  // flash: going light = white sweep, going dark = black sweep
+  themeFlash.className = isLight ? 'flash-light' : 'flash-dark';
+  // force reflow to restart animation
+  void themeFlash.offsetWidth;
+  themeFlash.className = isLight ? 'flash-light' : 'flash-dark';
+
+  // apply theme at peak of flash (midpoint ~200ms)
+  setTimeout(() => {
+    html.classList.toggle('light', isLight);
+    themeBtn.textContent = isLight ? '🌙' : '☀️';
+  }, 180);
+
+  // clean up class after animation
+  setTimeout(() => { themeFlash.className = ''; }, 500);
 });
 
 // ── CANVAS NEURAL NETWORK BACKGROUND ──
