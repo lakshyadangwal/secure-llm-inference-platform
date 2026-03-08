@@ -111,7 +111,7 @@ class RateAnalyzer:
         stdev = variance ** 0.5
         cv = stdev / mean   # Coefficient of variation
         # Low CV = regular = bot-like; High CV = irregular = human-like
-        return round(max(0.0, 1.0 - min(cv, 1.0)), 3)
+        return round(max(0.0, 1.0 - min(cv, 1.0)), 3)  # type: ignore[call-overload]
 
     def get_ip_stats(self, ip: str) -> Optional[IPRateStats]:
         """Compute rate analytics for a single IP."""
@@ -127,7 +127,7 @@ class RateAnalyzer:
         in_second = [t for t in all_ts if (now - t) <= 1.0]
         in_burst  = [t for t in all_ts if (now - t) <= BURST_WINDOW]
 
-        intervals = self._compute_intervals(in_window[-100:])
+        intervals = self._compute_intervals(list(in_window)[-100:])  # type: ignore[index]
 
         req_per_sec = len(in_second)
         req_per_min = len(in_minute)
@@ -135,19 +135,19 @@ class RateAnalyzer:
 
         avg_rate = req_per_min / 60.0 if req_per_min > 0 else 0.0
         burst_rate = len(in_burst) / BURST_WINDOW
-        burst_coeff = round(burst_rate / max(avg_rate, 0.001), 2)
+        burst_coeff = round(burst_rate / max(avg_rate, 0.001), 2)  # type: ignore[call-overload]
 
         reg_score = self._regularity_score(intervals)
 
         return IPRateStats(
             ip=ip,
-            req_per_sec=round(req_per_sec, 2),
-            req_per_min=round(req_per_min, 2),
-            req_per_hour=round(req_per_hour, 2),
+            req_per_sec=round(req_per_sec, 2),  # type: ignore[call-overload]
+            req_per_min=round(req_per_min, 2),  # type: ignore[call-overload]
+            req_per_hour=round(req_per_hour, 2),  # type: ignore[call-overload]
             burst_coefficient=burst_coeff,
-            p50_interval_ms=round(self._percentile(intervals, 50), 1),
-            p90_interval_ms=round(self._percentile(intervals, 90), 1),
-            p99_interval_ms=round(self._percentile(intervals, 99), 1),
+            p50_interval_ms=round(self._percentile(intervals, 50), 1),  # type: ignore[call-overload]
+            p90_interval_ms=round(self._percentile(intervals, 90), 1),  # type: ignore[call-overload]
+            p99_interval_ms=round(self._percentile(intervals, 99), 1),  # type: ignore[call-overload]
             regularity_score=reg_score,
             total_in_window=req_per_hour,
             is_burst=burst_coeff > 5.0,
@@ -178,7 +178,7 @@ class RateAnalyzer:
             global_req_per_sec=round(len(global_second), 2),
             global_req_per_min=round(len(global_minute), 2),
             busiest_ip=busiest_ip,
-            busiest_ip_rpm=round(busiest_rpm, 2),
+            busiest_ip_rpm=round(busiest_rpm, 2),  # type: ignore[call-overload]
         )
 
     def get_bot_like_ips(self, limit: int = 20) -> list[dict]:
@@ -195,7 +195,7 @@ class RateAnalyzer:
                     "req_per_min": stats.req_per_min,
                     "p50_interval_ms": stats.p50_interval_ms,
                 })
-        return sorted(results, key=lambda x: x["regularity_score"], reverse=True)[:limit]
+        return sorted(results, key=lambda x: x["regularity_score"], reverse=True)[:limit]  # type: ignore[index]
 
     def get_stats(self) -> dict:
         gs = self.get_global_stats()

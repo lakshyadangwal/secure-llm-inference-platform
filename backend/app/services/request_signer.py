@@ -189,7 +189,7 @@ class RequestSigner:
             self._total_rejected += 1
             return VerifyResult(False, "invalid_signature_format", age)
 
-        provided_sig = signature_header[len(expected_prefix):]
+        provided_sig = signature_header[len(expected_prefix):]  # type: ignore[index]
 
         with self._lock:
             secrets_to_try = list(self._secrets)
@@ -213,9 +213,9 @@ class RequestSigner:
         # Hard cap
         if len(self._nonces) > MAX_NONCES:
             excess = len(self._nonces) - MAX_NONCES
-            for _, n in self._nonce_ages[:excess]:
+            for _, n in self._nonce_ages[:excess]:  # type: ignore[index]
                 self._nonces.discard(n)
-            self._nonce_ages = self._nonce_ages[excess:]
+            self._nonce_ages = self._nonce_ages[excess:]  # type: ignore[index]
 
     # ── API key helpers ────────────────────────────────────────────────────────
 
@@ -246,7 +246,7 @@ class RequestSigner:
                 "total_rejected": self._total_rejected,
                 "active_secrets": len(self._secrets),
                 "tracked_nonces": len(self._nonces),
-                "rejection_rate_pct": round(
+                "rejection_rate_pct": round(  # type: ignore[call-overload]
                     self._total_rejected / max(self._total_verified, 1) * 100, 1
                 ),
             }

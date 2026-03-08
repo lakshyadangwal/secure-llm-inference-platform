@@ -17,6 +17,7 @@ Endpoints:
   GET /api/diag/full              — combined full diagnostics snapshot
 """
 
+import importlib
 import logging
 import time
 from fastapi import APIRouter, Query
@@ -70,7 +71,7 @@ async def list_modules():
     available = 0
     for name, module_path, attr in _MODULES:
         try:
-            mod = __import__(module_path, fromlist=[attr])
+            mod = importlib.import_module(module_path)
             obj = getattr(mod, attr, None)
             status = "available" if obj is not None else "import_ok_attr_missing"
             available += 1
@@ -189,7 +190,7 @@ async def full_diagnostics():
 
     for name, module_path, attr in _MODULES:
         try:
-            mod = __import__(module_path, fromlist=[attr])
+            mod = importlib.import_module(module_path)  # type: ignore[assignment]
             obj = getattr(mod, attr, None)
             if obj and hasattr(obj, "get_stats"):
                 snapshot["modules"][name] = obj.get_stats()

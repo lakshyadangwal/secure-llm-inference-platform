@@ -42,7 +42,8 @@ class PolicySeverity(str, Enum):
 
     @property
     def numeric(self) -> int:
-        return {"low": 1, "medium": 2, "high": 3, "critical": 4}[self.value]
+        _map: dict[str, int] = {"low": 1, "medium": 2, "high": 3, "critical": 4}
+        return _map[str(self.value)]
 
 
 class PolicyAction(str, Enum):
@@ -219,7 +220,7 @@ class ContentPolicyEngine:
     def unregister(self, name: str) -> bool:
         """Remove a policy by name. Returns True if it existed."""
         if name in self._policies:
-            del self._policies[name]
+            self._policies.pop(name, None)
             return True
         return False
 
@@ -321,7 +322,7 @@ class ContentPolicyEngine:
             "total_evaluations": self._eval_count,
             "total_blocks": self._block_count,
             "total_warns": self._warn_count,
-            "block_rate_pct": round(self._block_count / max(self._eval_count, 1) * 100, 1),
+            "block_rate_pct": round(float(self._block_count) / max(self._eval_count, 1) * 100, 1),
         }
 
 

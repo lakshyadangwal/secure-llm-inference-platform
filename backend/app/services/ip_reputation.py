@@ -68,7 +68,7 @@ class IPReputationRecord:
         if self.is_permanently_blocked:
             return True
         if self.is_temporarily_blocked:
-            if self.block_expires_at and time.time() > self.block_expires_at:
+            if self.block_expires_at is not None and time.time() > self.block_expires_at:
                 self.is_temporarily_blocked = False
                 return False
             return True
@@ -150,14 +150,14 @@ class IPReputationManager:
             # Apply decay for inactivity
             hours_idle = (now - record.last_seen) / 3600.0
             decayed = record.reputation_score * ((1 - self._score_decay) ** hours_idle)
-            return max(0.0, round(decayed, 3))
+            return max(0.0, round(float(decayed), 3))  # type: ignore[call-overload]
 
         # Weighted sum: recent violations count more
         total_score = 0.0
         for v in recent:
             age_factor = max(0.0, 1.0 - (v.age_seconds / self._violation_window))
             total_score += v.severity * age_factor
-        return min(1.0, round(total_score / max(len(recent), 1), 3))
+        return min(1.0, round(float(total_score) / max(len(recent), 1), 3))  # type: ignore[call-overload]
 
     # ── Public API ─────────────────────────────────────────────────────────────
 
@@ -214,7 +214,7 @@ class IPReputationManager:
             record.violations.append(event)
             # Keep last 500 violations per IP
             if len(record.violations) > 500:
-                record.violations = record.violations[-500:]
+                record.violations = list(record.violations)[-500:]  # type: ignore[index]
             self._total_violations += 1
         logger.info(
             "⚠️  Violation recorded — ip=%s  type=%s  severity=%.2f",
@@ -292,6 +292,7 @@ class IPReputationManager:
         with self._lock:
             records = list(self._records.values())
         scored = sorted(records, key=lambda r: r.reputation_score, reverse=True)
+        top = list(scored)[:limit]  # type: ignore[index]
         return [
             {
                 "ip": r.ip,
@@ -299,7 +300,7 @@ class IPReputationManager:
                 "verdict": r.verdict,
                 "violation_count": len(r.violations),
             }
-            for r in scored[:limit]
+            for r in top
         ]
 
     def export_blocklist(self) -> list[dict]:

@@ -1,0 +1,9 @@
+Collecting google-auth
+  Downloading google_auth-2.49.0-py3-none-any.whl.metadata (6.2 kB)
+Collecting pyasn1-modules>=0.2.1 (from google-auth)
+  Downloading pyasn1_modules-0.4.2-py3-none-any.whl.metadata (3.5 kB)
+Collecting cryptography>=38.0.3 (from google-auth)
+  Downloading cryptography-46.0.5.tar.gz (750 kB)
+     -------------------------------- 750.1/750.1 kB 2.2 MB/s  0:00:00
+  Installing build dependencies: started
+  Installing build dependencies: finished with status 'error'
