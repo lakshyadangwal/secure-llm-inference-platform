@@ -1,0 +1,350 @@
+
+> neuro-sentry-defense@2.0.0 lint
+> eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0
+
+
+/home/vic/Documents/git-grind/secure-llm-inference-platform/src/App.jsx
+    1:8   error    'React' is defined but never used                                                                                          no-unused-vars
+   56:6   warning  React Hook useEffect has a missing dependency: 'checkBackendConnection'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  325:29  error    'loginBtn' is assigned a value but never used                                                                              no-unused-vars
+
+/home/vic/Documents/git-grind/secure-llm-inference-platform/src/components/AttackFlowVisualizer.jsx
+    1:8   error  'React' is defined but never used                     no-unused-vars
+   19:7   error  'FAST_BLOCK_PATH' is assigned a value but never used  no-unused-vars
+   21:21  error  'fromX' is missing in props validation                react/prop-types
+   21:28  error  'fromY' is missing in props validation                react/prop-types
+   21:35  error  'toX' is missing in props validation                  react/prop-types
+   21:40  error  'toY' is missing in props validation                  react/prop-types
+   21:45  error  'color' is missing in props validation                react/prop-types
+   21:52  error  'delay' is missing in props validation                react/prop-types
+   21:63  error  'duration' is missing in props validation             react/prop-types
+   36:33  error  'isProcessing' is missing in props validation         react/prop-types
+   36:55  error  'lastResult' is missing in props validation           react/prop-types
+   39:12  error  'resultColor' is assigned a value but never used      no-unused-vars
+   66:11  error  'getStageColor' is assigned a value but never used    no-unused-vars
+  169:34  error  'stage' is defined but never used                     no-unused-vars
+  169:41  error  'i' is defined but never used                         no-unused-vars
+  170:25  error  Missing "key" prop for element in iterator            react/jsx-key
+  171:30  error  'isActive' is not defined                             no-undef
+  174:30  error  'isPassed' is not defined                             no-undef
+
+/home/vic/Documents/git-grind/secure-llm-inference-platform/src/components/AttackLab.jsx
+    1:8   error  'React' is defined but never used                         no-unused-vars
+    4:23  error  'text' is missing in props validation                     react/prop-types
+    4:29  error  'size' is missing in props validation                     react/prop-types
+   59:22  error  'code' is missing in props validation                     react/prop-types
+   59:28  error  'lang' is missing in props validation                     react/prop-types
+   61:22  error  'code.split' is missing in props validation               react/prop-types
+   93:24  error  'content' is missing in props validation                  react/prop-types
+  106:22  error  'attack' is missing in props validation                   react/prop-types
+  106:30  error  'isSimulating' is missing in props validation             react/prop-types
+  106:44  error  'onSimulate' is missing in props validation               react/prop-types
+  107:47  error  'attack.lastPrompt' is missing in props validation        react/prop-types
+  126:85  error  'attack.name' is missing in props validation              react/prop-types
+  128:25  error  'attack.type' is missing in props validation              react/prop-types
+  128:30  error  'attack.type.toUpperCase' is missing in props validation  react/prop-types
+  131:87  error  'attack.description' is missing in props validation       react/prop-types
+  141:30  error  'attack.successRate' is missing in props validation       react/prop-types
+  142:32  error  'attack.successRate' is missing in props validation       react/prop-types
+  143:32  error  'attack.successRate' is missing in props validation       react/prop-types
+  146:47  error  'attack.successRate' is missing in props validation       react/prop-types
+  151:24  error  'attack.successRate' is missing in props validation       react/prop-types
+  152:26  error  'attack.successRate' is missing in props validation       react/prop-types
+  153:26  error  'attack.successRate' is missing in props validation       react/prop-types
+  155:27  error  'attack.successRate' is missing in props validation       react/prop-types
+  227:23  error  'attack.lastResponse' is missing in props validation      react/prop-types
+  227:64  error  'attack.lastResponse' is missing in props validation      react/prop-types
+  232:21  error  'attack.lastResponse' is missing in props validation      react/prop-types
+  235:27  error  'attack.successRate' is missing in props validation       react/prop-types
+  244:91  error  'attack.successRate' is missing in props validation       react/prop-types
+  245:29  error  'attack.successRate' is missing in props validation       react/prop-types
+  248:46  error  'attack.lastResponse' is missing in props validation      react/prop-types
+
+/home/vic/Documents/git-grind/secure-llm-inference-platform/src/components/AttackSidebar.jsx
+   1:8   error  'React' is defined but never used             no-unused-vars
+   4:26  error  'attacks' is missing in props validation      react/prop-types
+   4:35  error  'onSelect' is missing in props validation     react/prop-types
+   4:45  error  'selectedId' is missing in props validation   react/prop-types
+  49:18  error  'attacks.map' is missing in props validation  react/prop-types
+
+/home/vic/Documents/git-grind/secure-llm-inference-platform/src/components/ConsolePanel.jsx
+   1:8   error  'React' is defined but never used          no-unused-vars
+   3:25  error  'logs' is missing in props validation      react/prop-types
+  32:15  error  'logs.map' is missing in props validation  react/prop-types
+
+/home/vic/Documents/git-grind/secure-llm-inference-platform/src/components/Dashboard.jsx
+  1:8   error  'React' is defined but never used              no-unused-vars
+  6:22  error  'isDefending' is missing in props validation   react/prop-types
+  6:35  error  'isProcessing' is missing in props validation  react/prop-types
+  6:49  error  'isBreached' is missing in props validation    react/prop-types
+  6:61  error  'stats' is missing in props validation         react/prop-types
+
+/home/vic/Documents/git-grind/secure-llm-inference-platform/src/components/DefenseToggle.jsx
+  1:8   error  'React' is defined but never used             no-unused-vars
+  3:26  error  'isDefending' is missing in props validation  react/prop-types
+  3:39  error  'onToggle' is missing in props validation     react/prop-types
+
+/home/vic/Documents/git-grind/secure-llm-inference-platform/src/components/DirectChat.jsx
+   1:8   error  'React' is defined but never used                  no-unused-vars
+   4:23  error  'text' is missing in props validation              react/prop-types
+   4:29  error  'size' is missing in props validation              react/prop-types
+  45:22  error  'code' is missing in props validation              react/prop-types
+  45:28  error  'lang' is missing in props validation              react/prop-types
+  47:22  error  'code.split' is missing in props validation        react/prop-types
+  78:24  error  'content' is missing in props validation           react/prop-types
+  91:23  error  'backendConnected' is missing in props validation  react/prop-types
+
+/home/vic/Documents/git-grind/secure-llm-inference-platform/src/components/GoogleLogin.jsx
+    1:8   error    'React' is defined but never used                                                                                                                                                                                                            no-unused-vars
+    7:39  error    'onLoginSuccess' is missing in props validation                                                                                                                                                                                              react/prop-types
+    7:55  error    'onLogout' is missing in props validation                                                                                                                                                                                                    react/prop-types
+   31:8   warning  React Hook useEffect has a missing dependency: 'onLoginSuccess'. Either include it or remove the dependency array. If 'onLoginSuccess' changes too often, find the parent component that defines it and wrap that definition in useCallback  react-hooks/exhaustive-deps
+   47:8   warning  React Hook useEffect has a missing dependency: 'handleCredentialResponse'. Either include it or remove the dependency array                                                                                                                  react-hooks/exhaustive-deps
+  262:10  error    'GoogleIcon' is defined but never used                                                                                                                                                                                                       no-unused-vars
+
+/home/vic/Documents/git-grind/secure-llm-inference-platform/src/components/Header.jsx
+  1:8   error  'React' is defined but never used                  no-unused-vars
+  6:19  error  'backendConnected' is missing in props validation  react/prop-types
+  6:45  error  'user' is missing in props validation              react/prop-types
+  6:45  error  'user' is defined but never used                   no-unused-vars
+  6:51  error  'onLoginSuccess' is missing in props validation    react/prop-types
+  6:67  error  'onLogout' is missing in props validation          react/prop-types
+
+/home/vic/Documents/git-grind/secure-llm-inference-platform/src/components/IndexPage.jsx
+  1:8   error  'React' is defined but never used         no-unused-vars
+  4:22  error  'onEnter' is missing in props validation  react/prop-types
+
+/home/vic/Documents/git-grind/secure-llm-inference-platform/src/components/NetworkPanel.jsx
+   1:8   error  'React' is defined but never used                  no-unused-vars
+   1:27  error  'useRef' is defined but never used                 no-unused-vars
+   6:25  error  'backendConnected' is missing in props validation  react/prop-types
+  45:24  error  'src' is missing in props validation               react/prop-types
+  45:29  error  'label' is missing in props validation             react/prop-types
+  45:36  error  'accentColor' is missing in props validation       react/prop-types
+
+/home/vic/Documents/git-grind/secure-llm-inference-platform/src/components/RagScanner.jsx
+   1:8    error  'React' is defined but never used                                no-unused-vars
+  79:238  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+/home/vic/Documents/git-grind/secure-llm-inference-platform/src/components/RedTeamFuzzer.jsx
+  1:8  error  'React' is defined but never used  no-unused-vars
+
+/home/vic/Documents/git-grind/secure-llm-inference-platform/src/components/RuleBuilder.jsx
+  1:8  error  'React' is defined but never used  no-unused-vars
+
+/home/vic/Documents/git-grind/secure-llm-inference-platform/src/components/StatsGrid.jsx
+   1:8    error  'React' is defined but never used                     no-unused-vars
+   4:22   error  'stats' is missing in props validation                react/prop-types
+   7:52   error  'stats.totalAttempts' is missing in props validation  react/prop-types
+  11:51   error  'stats.totalBlocked' is missing in props validation   react/prop-types
+  15:51   error  'stats.totalLeaked' is missing in props validation    react/prop-types
+  15:77   error  'stats.totalAttempts' is missing in props validation  react/prop-types
+  15:99   error  'stats.totalAttempts' is missing in props validation  react/prop-types
+  15:121  error  'stats.totalLeaked' is missing in props validation    react/prop-types
+  19:44   error  'stats.uptime' is missing in props validation         react/prop-types
+
+/home/vic/Documents/git-grind/secure-llm-inference-platform/src/components/StatusCard.jsx
+  1:8   error  'React' is defined but never used              no-unused-vars
+  3:23  error  'isDefending' is missing in props validation   react/prop-types
+  3:36  error  'isProcessing' is missing in props validation  react/prop-types
+  3:50  error  'isBreached' is missing in props validation    react/prop-types
+
+/home/vic/Documents/git-grind/secure-llm-inference-platform/src/components/ThreatAnalytics.jsx
+    1:8   error    'React' is defined but never used                                                           no-unused-vars
+    1:38  error    'useRef' is defined but never used                                                          no-unused-vars
+    4:7   error    'generateTimeSeriesData' is assigned a value but never used                                 no-unused-vars
+   17:7   error    'generateHeatmapData' is assigned a value but never used                                    no-unused-vars
+   30:7   warning  Fast refresh only works when a file has exports. Move your component(s) to a separate file  react-refresh/only-export-components
+   30:7   error    'LineChart' is assigned a value but never used                                              no-unused-vars
+   30:22  error    'data' is missing in props validation                                                       react/prop-types
+   49:37  error    'data.flatMap' is missing in props validation                                               react/prop-types
+   52:21  error    'data.map' is missing in props validation                                                   react/prop-types
+   53:41  error    'data.length' is missing in props validation                                                react/prop-types
+   78:23  error    'data.map' is missing in props validation                                                   react/prop-types
+   80:49  error    'data.length' is missing in props validation                                                react/prop-types
+  108:26  error    'data.map' is missing in props validation                                                   react/prop-types
+  109:53  error    'data.length' is missing in props validation                                                react/prop-types
+  145:7   warning  Fast refresh only works when a file has exports. Move your component(s) to a separate file  react-refresh/only-export-components
+  145:7   error    'Heatmap' is assigned a value but never used                                                no-unused-vars
+  145:20  error    'data' is missing in props validation                                                       react/prop-types
+  175:51  error    'data.find' is missing in props validation                                                  react/prop-types
+
+/home/vic/Documents/git-grind/secure-llm-inference-platform/src/components/ThreatMap.jsx
+  1:8  error  'React' is defined but never used  no-unused-vars
+
+/home/vic/Documents/git-grind/secure-llm-inference-platform/src/components/analytics/AnalyticsDashboard.jsx
+  1:8  error  'React' is defined but never used  no-unused-vars
+
+/home/vic/Documents/git-grind/secure-llm-inference-platform/src/components/analytics/MetricCard.jsx
+   1:8   error  'React' is defined but never used       no-unused-vars
+  11:23  error  'title' is missing in props validation  react/prop-types
+  11:30  error  'value' is missing in props validation  react/prop-types
+  11:37  error  'icon' is missing in props validation   react/prop-types
+  11:43  error  'color' is missing in props validation  react/prop-types
+
+/home/vic/Documents/git-grind/secure-llm-inference-platform/src/components/analytics/SecurityEventsTable.jsx
+   1:8   error  'React' is defined but never used               no-unused-vars
+   4:32  error  'events' is missing in props validation         react/prop-types
+  23:25  error  'events.length' is missing in props validation  react/prop-types
+  29:33  error  'events.map' is missing in props validation     react/prop-types
+
+/home/vic/Documents/git-grind/secure-llm-inference-platform/src/components/analytics/UsageChart.jsx
+  1:8  error  'React' is defined but never used  no-unused-vars
+
+/home/vic/Documents/git-grind/secure-llm-inference-platform/src/components/audit/AuditLogs.jsx
+  1:8  error  'React' is defined but never used  no-unused-vars
+
+/home/vic/Documents/git-grind/secure-llm-inference-platform/src/components/audit/LogFilter.jsx
+  1:8   error  'React' is defined but never used           no-unused-vars
+  4:22  error  'filter' is missing in props validation     react/prop-types
+  4:30  error  'setFilter' is missing in props validation  react/prop-types
+
+/home/vic/Documents/git-grind/secure-llm-inference-platform/src/components/audit/LogViewer.jsx
+   1:8   error  'React' is defined but never used             no-unused-vars
+   3:22  error  'logs' is missing in props validation         react/prop-types
+   3:28  error  'loading' is missing in props validation      react/prop-types
+   8:14  error  'logs.length' is missing in props validation  react/prop-types
+  25:27  error  'logs.map' is missing in props validation     react/prop-types
+
+/home/vic/Documents/git-grind/secure-llm-inference-platform/src/components/playground/ChatWindow.jsx
+  1:8   error  'React' is defined but never used                 no-unused-vars
+  5:23  error  'model' is missing in props validation            react/prop-types
+  5:30  error  'temperature' is missing in props validation      react/prop-types
+  5:43  error  'systemPrompt' is missing in props validation     react/prop-types
+  5:57  error  'securityEnabled' is missing in props validation  react/prop-types
+
+/home/vic/Documents/git-grind/secure-llm-inference-platform/src/components/playground/MessageBubble.jsx
+   1:8   error  'React' is defined but never used                 no-unused-vars
+   4:26  error  'message' is missing in props validation          react/prop-types
+   5:28  error  'message.role' is missing in props validation     react/prop-types
+   6:30  error  'message.role' is missing in props validation     react/prop-types
+   8:26  error  'message.meta' is missing in props validation     react/prop-types
+  30:76  error  'message.role' is missing in props validation     react/prop-types
+  41:34  error  'message.content' is missing in props validation  react/prop-types
+
+/home/vic/Documents/git-grind/secure-llm-inference-platform/src/components/playground/ModelSelector.jsx
+  1:8   error  'React' is defined but never used                no-unused-vars
+  3:26  error  'model' is missing in props validation           react/prop-types
+  3:33  error  'setModel' is missing in props validation        react/prop-types
+  3:43  error  'temperature' is missing in props validation     react/prop-types
+  3:56  error  'setTemperature' is missing in props validation  react/prop-types
+
+/home/vic/Documents/git-grind/secure-llm-inference-platform/src/components/playground/Playground.jsx
+   1:8   error  'React' is defined but never used   no-unused-vars
+  53:51  error  'prompt' is defined but never used  no-unused-vars
+
+/home/vic/Documents/git-grind/secure-llm-inference-platform/src/components/playground/PromptCard.jsx
+   1:8    error  'React' is defined but never used                    no-unused-vars
+   4:23   error  'prompt' is missing in props validation              react/prop-types
+   4:31   error  'onLoad' is missing in props validation              react/prop-types
+   8:121  error  'prompt.name' is missing in props validation         react/prop-types
+   9:131  error  'prompt.category' is missing in props validation     react/prop-types
+  12:25   error  'prompt.description' is missing in props validation  react/prop-types
+
+/home/vic/Documents/git-grind/secure-llm-inference-platform/src/components/playground/PromptLibrary.jsx
+  1:8   error  'React' is defined but never used              no-unused-vars
+  5:26  error  'onLoadPrompt' is missing in props validation  react/prop-types
+
+/home/vic/Documents/git-grind/secure-llm-inference-platform/src/components/playground/SystemPromptInput.jsx
+  1:8   error  'React' is defined but never used                 no-unused-vars
+  4:30  error  'systemPrompt' is missing in props validation     react/prop-types
+  4:44  error  'setSystemPrompt' is missing in props validation  react/prop-types
+
+/home/vic/Documents/git-grind/secure-llm-inference-platform/src/components/projects/ProjectCard.jsx
+   1:8    error  'React' is defined but never used                         no-unused-vars
+   4:24   error  'project' is missing in props validation                  react/prop-types
+  10:118  error  'project.name' is missing in props validation             react/prop-types
+  12:34   error  'project.id' is missing in props validation               react/prop-types
+  12:37   error  'project.id.substring' is missing in props validation     react/prop-types
+  16:84   error  'project.description' is missing in props validation      react/prop-types
+  24:90   error  'project.api_keys' is missing in props validation         react/prop-types
+  24:99   error  'project.api_keys.length' is missing in props validation  react/prop-types
+  26:30   error  'project.api_keys' is missing in props validation         react/prop-types
+  26:39   error  'project.api_keys.map' is missing in props validation     react/prop-types
+
+/home/vic/Documents/git-grind/secure-llm-inference-platform/src/components/projects/ProjectList.jsx
+  1:8  error  'React' is defined but never used  no-unused-vars
+
+/home/vic/Documents/git-grind/secure-llm-inference-platform/src/components/quotas/QuotaProgress.jsx
+   1:8    error  'React' is defined but never used                      no-unused-vars
+   4:26   error  'quota' is missing in props validation                 react/prop-types
+   5:29   error  'quota.tokens_used' is missing in props validation     react/prop-types
+   5:49   error  'quota.token_limit' is missing in props validation     react/prop-types
+   6:29   error  'quota.spend' is missing in props validation           react/prop-types
+   6:43   error  'quota.budget' is missing in props validation          react/prop-types
+  16:98   error  'quota.name' is missing in props validation            react/prop-types
+  23:64   error  'quota.tokens_used' is missing in props validation     react/prop-types
+  23:103  error  'quota.token_limit' is missing in props validation     react/prop-types
+  38:65   error  'quota.spend' is missing in props validation           react/prop-types
+  38:71   error  'quota.spend.toFixed' is missing in props validation   react/prop-types
+  38:93   error  'quota.budget' is missing in props validation          react/prop-types
+  38:100  error  'quota.budget.toFixed' is missing in props validation  react/prop-types
+
+/home/vic/Documents/git-grind/secure-llm-inference-platform/src/components/quotas/Quotas.jsx
+  1:8   error  'React' is defined but never used      no-unused-vars
+  1:27  error  'useEffect' is defined but never used  no-unused-vars
+
+/home/vic/Documents/git-grind/secure-llm-inference-platform/src/components/routing/NodeStatus.jsx
+   1:8   error  'React' is defined but never used                   no-unused-vars
+   4:23  error  'node' is missing in props validation               react/prop-types
+   5:37  error  'node.current_load' is missing in props validation  react/prop-types
+  13:14  error  'node.status' is missing in props validation        react/prop-types
+  20:87  error  'node.id' is missing in props validation            react/prop-types
+  22:34  error  'node.status' is missing in props validation        react/prop-types
+  27:65  error  'node.model' is missing in props validation         react/prop-types
+  33:33  error  'node.capacity' is missing in props validation      react/prop-types
+
+/home/vic/Documents/git-grind/secure-llm-inference-platform/src/components/routing/RoutingDashboard.jsx
+  1:8  error  'React' is defined but never used  no-unused-vars
+
+/home/vic/Documents/git-grind/secure-llm-inference-platform/src/components/routing/TrafficGraph.jsx
+   1:8   error  'React' is defined but never used           no-unused-vars
+   3:25  error  'nodes' is missing in props validation      react/prop-types
+  24:24  error  'nodes.map' is missing in props validation  react/prop-types
+  44:20  error  Unknown property 'jsx' found                react/no-unknown-property
+
+/home/vic/Documents/git-grind/secure-llm-inference-platform/src/components/security/PiiSettings.jsx
+   1:8   error  'React' is defined but never used          no-unused-vars
+  25:23  error  'checked' is missing in props validation   react/prop-types
+  25:32  error  'onChange' is missing in props validation  react/prop-types
+  25:42  error  'label' is missing in props validation     react/prop-types
+
+/home/vic/Documents/git-grind/secure-llm-inference-platform/src/components/security/ThreatCard.jsx
+   1:8    error  'React' is defined but never used                 no-unused-vars
+   4:23   error  'threat' is missing in props validation           react/prop-types
+  16:128  error  'threat.severity' is missing in props validation  react/prop-types
+  20:29   error  'threat.actor' is missing in props validation     react/prop-types
+  23:29   error  'threat.severity' is missing in props validation  react/prop-types
+  30:35   error  'threat.type' is missing in props validation      react/prop-types
+  34:35   error  'threat.ioc' is missing in props validation       react/prop-types
+
+/home/vic/Documents/git-grind/secure-llm-inference-platform/src/components/security/ThreatIntelBoard.jsx
+  1:8  error  'React' is defined but never used  no-unused-vars
+
+/home/vic/Documents/git-grind/secure-llm-inference-platform/src/components/settings/ApiKeysSettings.jsx
+  1:8   error  'React' is defined but never used             no-unused-vars
+  6:18  error  'setKeys' is assigned a value but never used  no-unused-vars
+
+/home/vic/Documents/git-grind/secure-llm-inference-platform/src/components/settings/ModelPreferences.jsx
+  1:8  error  'React' is defined but never used  no-unused-vars
+
+/home/vic/Documents/git-grind/secure-llm-inference-platform/src/components/settings/SecuritySettings.jsx
+  1:8  error  'React' is defined but never used  no-unused-vars
+
+/home/vic/Documents/git-grind/secure-llm-inference-platform/src/components/settings/SettingsLayout.jsx
+  1:8  error  'React' is defined but never used  no-unused-vars
+
+/home/vic/Documents/git-grind/secure-llm-inference-platform/src/context/ThemeContext.jsx
+   1:8   error    'React' is defined but never used                                                                                               no-unused-vars
+   5:33  error    'children' is missing in props validation                                                                                       react/prop-types
+  31:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/home/vic/Documents/git-grind/secure-llm-inference-platform/src/services/api.js
+  37:11  error  'userData' is assigned a value but never used  no-unused-vars
+  59:3   error  Unnecessary try/catch wrapper                  no-useless-catch
+  71:3   error  Unnecessary try/catch wrapper                  no-useless-catch
+  80:3   error  Unnecessary try/catch wrapper                  no-useless-catch
+  89:3   error  Unnecessary try/catch wrapper                  no-useless-catch
+
+✖ 245 problems (239 errors, 6 warnings)
+
