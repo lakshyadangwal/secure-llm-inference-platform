@@ -165,15 +165,57 @@ const AttackFlowVisualizer = ({ isProcessing = false, lastResult = null }) => {
                             </g>
                         );
                     })}
-                    {fastBlock && <g> <motion.path /* red arc */ /> <motion.text>⚡ FAST BLOCK</motion.text> </g>}
-                    {STAGES.map((stage, i) => (
+                    {fastBlock && (
                         <g>
-                            {isActive && <motion.circle /* pulsing glow ring */ />}
-                            <motion.circle /* node body */ />
-                            <svg /* icon */ /> <text /* label */ /> <text /* sublabel */ />
-                            {isPassed && <motion.g /* ✓ checkmark */ />}
+                            <motion.path
+                                d={`M ${STAGES[1].x} ${STAGES[1].y - nodeRadius - 10} Q ${(STAGES[1].x + STAGES[4].x) / 2} ${STAGES[1].y - 80} ${STAGES[4].x} ${STAGES[4].y - nodeRadius - 10}`}
+                                fill="none" stroke="#ef4444" strokeWidth={2} strokeDasharray="6 3"
+                                initial={{ pathLength: 0 }} animate={{ pathLength: 1 }}
+                                transition={{ duration: 0.6 }}
+                                style={{ filter: 'drop-shadow(0 0 4px #ef444480)' }}
+                            />
+                            <motion.text
+                                x={(STAGES[1].x + STAGES[4].x) / 2} y={STAGES[1].y - 70}
+                                textAnchor="middle" fill="#ef4444" fontSize={10} fontFamily="monospace" fontWeight="bold"
+                                initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}
+                            >⚡ FAST BLOCK</motion.text>
                         </g>
-                    ))}
+                    )}
+                    {STAGES.map((stage, i) => {
+                        const isActive = activeStage === i;
+                        const isPassed = activeStage > i;
+                        const color = getStageColor(i);
+                        return (
+                            <g key={`stage-${i}`}>
+                                {isActive && (
+                                    <motion.circle
+                                        cx={stage.x} cy={stage.y} r={nodeRadius + 6}
+                                        fill="none" stroke={color} strokeWidth={1.5} opacity={0.4}
+                                        animate={{ r: [nodeRadius + 6, nodeRadius + 14, nodeRadius + 6], opacity: [0.4, 0.1, 0.4] }}
+                                        transition={{ duration: 1.5, repeat: Infinity }}
+                                    />
+                                )}
+                                <motion.circle
+                                    cx={stage.x} cy={stage.y} r={nodeRadius}
+                                    fill="rgba(0,0,0,0.6)" stroke={color} strokeWidth={2}
+                                    animate={{ stroke: color }}
+                                    transition={{ duration: 0.3 }}
+                                    style={{ filter: isActive || isPassed ? `drop-shadow(0 0 8px ${color}60)` : 'none' }}
+                                />
+                                <svg x={stage.x - 10} y={stage.y - 10} width={20} height={20} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d={stage.icon} />
+                                </svg>
+                                <text x={stage.x} y={stage.y + nodeRadius + 18} textAnchor="middle" fill="currentColor" fontSize={9} fontFamily="monospace" fontWeight="bold" className="fill-[var(--text-secondary)]">{stage.label}</text>
+                                <text x={stage.x} y={stage.y + nodeRadius + 32} textAnchor="middle" fill="currentColor" fontSize={8} fontFamily="monospace" className="fill-[var(--text-muted)]">{stage.sublabel}</text>
+                                {isPassed && (
+                                    <motion.g initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: 'spring', delay: 0.1 }}>
+                                        <circle cx={stage.x + nodeRadius - 4} cy={stage.y - nodeRadius + 4} r={8} fill="#10b981" />
+                                        <path d={`M ${stage.x + nodeRadius - 8} ${stage.y - nodeRadius + 4} l 3 3 5 -5`} fill="none" stroke="white" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+                                    </motion.g>
+                                )}
+                            </g>
+                        );
+                    })}
                 </svg></div></motion.div>);
 };
 export default AttackFlowVisualizer;
