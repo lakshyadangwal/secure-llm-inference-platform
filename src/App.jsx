@@ -12,6 +12,8 @@ import NetworkPanel from './components/NetworkPanel';
 import { attackScenarios } from './data/attackScenarios';
 import { sendPrompt, getSystemStats } from './services/api';
 
+//bhavya was here
+
 function AppInner() {
   const [user, setUser] = useState(null);
   const [isDefending, setIsDefending] = useState(true);
