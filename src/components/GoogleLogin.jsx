@@ -154,31 +154,6 @@ export default function GoogleLogin({ onLoginSuccess, onLogout }) {
 
                     <div id="ns-google-btn" style={{ marginBottom: 12, display: "flex", justifyContent: "center" }} />
 
-                    <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "16px 0" }}>
-                        <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.08)" }} />
-                        <span style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", fontFamily: "monospace" }}>OR</span>
-                        <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.08)" }} />
-                    </div>
-
-                    <button onClick={() => {
-                        if (!window.google) return;
-                        window.google.accounts.id.initialize({ client_id: CLIENT_ID, callback: handleCredentialResponse });
-                        window.google.accounts.id.prompt();
-                    }}
-                        style={{
-                            display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
-                            width: "100%", padding: 12, background: "rgba(0,255,180,0.06)",
-                            border: "1px solid rgba(0,255,180,0.35)", borderRadius: 8,
-                            fontSize: 13, fontWeight: 700, color: teal, cursor: "pointer",
-                            fontFamily: "Courier New, monospace", letterSpacing: "0.06em",
-                            transition: "all 0.15s", boxSizing: "border-box",
-                        }}
-                        onMouseEnter={e => { e.currentTarget.style.background = "rgba(0,255,180,0.12)"; e.currentTarget.style.boxShadow = "0 0 16px rgba(0,255,180,0.2)"; }}
-                        onMouseLeave={e => { e.currentTarget.style.background = "rgba(0,255,180,0.06)"; e.currentTarget.style.boxShadow = "none"; }}
-                    >
-                        <GoogleIcon /> CONNECT WITH GOOGLE
-                    </button>
-
                     <p style={{ fontSize: 10, color: "rgba(255,255,255,0.25)", marginTop: 20, textAlign: "center", lineHeight: 1.6, fontFamily: "monospace" }}>
                         AUTHENTICATION REQUIRED FOR FULL SYSTEM ACCESS<br />
                         SESSION DATA IS ENCRYPTED AND NOT SHARED
