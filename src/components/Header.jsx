@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
 import GoogleLogin from './GoogleLogin';
 
-const Header = ({ backendConnected = false, user, onLoginSuccess, onLogout }) => {
+const Header = ({ backendConnected = false, user, onLoginSuccess, onLogout, isDefending = true, onToggleDefense }) => {
   const { isDark, toggleTheme } = useTheme();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const settingsRef = useRef(null);
@@ -62,6 +62,24 @@ const Header = ({ backendConnected = false, user, onLoginSuccess, onLogout }) =>
               }`}>
               MAINFRAME LINK: {backendConnected ? 'OK' : 'DEMO'}
             </span>
+          </div>
+
+          {/* Defense toggle — inline, no overlay */}
+          <div className="flex items-center gap-2 px-3 py-2 rounded-lg border bg-[var(--card-bg)] border-[var(--border-primary)]">
+            <div className={`w-2 h-2 rounded-full animate-pulse ${isDefending ? 'bg-emerald-500' : 'bg-red-500'}`} />
+            <span className={`text-xs font-mono tracking-wider ${isDefending ? 'text-emerald-400' : 'text-red-400'}`}>
+              {isDefending ? 'PROTECTED' : 'VULNERABLE'}
+            </span>
+            <button
+              onClick={onToggleDefense}
+              className={`relative ml-1 w-10 h-5 rounded-full transition-all duration-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 ${isDefending ? 'bg-emerald-500' : 'bg-red-500/60'
+                }`}
+              aria-pressed={isDefending}
+              aria-label="Toggle defense"
+            >
+              <span className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow-md transition-all duration-500 ${isDefending ? 'translate-x-5' : 'translate-x-0'
+                }`} />
+            </button>
           </div>
 
           {/* Google Login */}
