@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ThemeProvider } from './context/ThemeContext';
 import Header from './components/Header';
-import DefenseToggle from './components/DefenseToggle';
 import AttackSidebar from './components/AttackSidebar';
 import Dashboard from './components/Dashboard';
 import AttackLab from './components/AttackLab';
@@ -157,10 +156,9 @@ function AppInner() {
         user={user}
         onLoginSuccess={(u) => setUser(u)}
         onLogout={() => setUser(null)}
+        isDefending={isDefending}
+        onToggleDefense={() => setIsDefending(!isDefending)}
       />
-
-      {/* Fixed defense toggle */}
-      <DefenseToggle isDefending={isDefending} onToggle={() => setIsDefending(!isDefending)} />
 
       {/* Main layout — fixed exactly below the 5rem (80px) header */}
       <div className="fixed top-20 bottom-0 left-0 right-0 flex overflow-hidden">
