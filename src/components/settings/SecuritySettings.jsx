@@ -1,8 +1,29 @@
-import React, { useState } from 'react';
-import { ShieldCheck, Save } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ShieldCheck, Save, Check } from 'lucide-react';
+
+const STORAGE_KEY = 'ns_security_settings';
+
+const DEFAULTS = {
+    forcePiiRedaction: true,
+    auditLevel: 'verbose',
+};
 
 const SecuritySettings = () => {
-    const [auditLevel, setAuditLevel] = useState('verbose');
+    const [settings, setSettings] = useState(DEFAULTS);
+    const [saved, setSaved] = useState(false);
+
+    useEffect(() => {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+            try { setSettings(JSON.parse(stored)); } catch { }
+        }
+    }, []);
+
+    const handleSave = () => {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+        setSaved(true);
+        setTimeout(() => setSaved(false), 2000);
+    };
 
     return (
         <div className="flex flex-col h-full">
@@ -18,7 +39,12 @@ const SecuritySettings = () => {
                         <p className="text-xs text-gray-500">Overrides project settings to ensure PII is always masked.</p>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" className="sr-only peer" defaultChecked={true} />
+                        <input
+                            type="checkbox"
+                            className="sr-only peer"
+                            checked={settings.forcePiiRedaction}
+                            onChange={(e) => { setSettings(s => ({ ...s, forcePiiRedaction: e.target.checked })); setSaved(false); }}
+                        />
                         <div className="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
                     </label>
                 </div>
@@ -27,8 +53,8 @@ const SecuritySettings = () => {
                     <h4 className="font-semibold text-gray-200 mb-2">Audit Logging Level</h4>
                     <select
                         className="w-full bg-gray-800 border border-gray-600 rounded p-2 text-sm text-white focus:outline-none focus:border-cyan-500"
-                        value={auditLevel}
-                        onChange={(e) => setAuditLevel(e.target.value)}
+                        value={settings.auditLevel}
+                        onChange={(e) => { setSettings(s => ({ ...s, auditLevel: e.target.value })); setSaved(false); }}
                     >
                         <option value="critical">Critical Only (Less noise, ignores minor blocks)</option>
                         <option value="standard">Standard (Logs all threats and blocks)</option>
@@ -37,8 +63,11 @@ const SecuritySettings = () => {
                 </div>
 
                 <div className="flex justify-end pt-4">
-                    <button className="flex items-center gap-2 px-6 py-2 bg-green-600 hover:bg-green-500 text-white rounded-lg font-semibold transition-colors">
-                        <Save className="w-4 h-4" /> Save Global Policies
+                    <button
+                        onClick={handleSave}
+                        className={`flex items-center gap-2 px-6 py-2 rounded-lg font-semibold transition-colors ${saved ? 'bg-green-700 text-green-200' : 'bg-green-600 hover:bg-green-500 text-white'}`}
+                    >
+                        {saved ? <><Check className="w-4 h-4" /> Saved</> : <><Save className="w-4 h-4" /> Save Global Policies</>}
                     </button>
                 </div>
             </div>

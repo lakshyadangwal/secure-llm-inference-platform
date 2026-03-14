@@ -161,7 +161,7 @@ export default function GoogleLogin({ onLoginSuccess, onLogout }) {
                         <span style={{ color: teal }}>&#x25B6;</span> Session token lifetime: 24h
                     </div>
 
-                    <div id="ns-google-btn" style={{ marginTop: 24, marginBottom: 24, display: "flex", justifyContent: "center" }} />
+                    <div id="ns-google-btn" style={{ marginBottom: 12, display: "flex", justifyContent: "center" }} />
 
                     <p style={{ fontSize: 10, color: "rgba(255,255,255,0.25)", marginTop: 20, textAlign: "center", lineHeight: 1.6, fontFamily: "monospace" }}>
                         AUTHENTICATION REQUIRED FOR FULL SYSTEM ACCESS<br />

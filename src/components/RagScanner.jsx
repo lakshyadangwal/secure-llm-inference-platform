@@ -1,5 +1,16 @@
 import React, { useState, useRef } from 'react';
-import { api } from '../services/api';
+
+// Client-side injection detection patterns
+const INJECTION_PATTERNS = [
+    { name: 'System Prompt Override', pattern: /\b(ignore|disregard|forget)\b.*\b(previous|prior|above|all)\b.*\b(instructions?|rules?|guidelines?|prompt)\b/i },
+    { name: 'Role Manipulation', pattern: /\b(you are now|act as|pretend|roleplay|from now on)\b/i },
+    { name: 'Hidden Instruction', pattern: /\[SYSTEM\]|\[ADMIN\]|\[OVERRIDE\]|<\/?system>|<\/?instruction>/i },
+    { name: 'DAN / Jailbreak', pattern: /\bDAN\b|do anything now|bypass.*(?:rules|safety|filter)|jailbreak/i },
+    { name: 'Data Exfiltration', pattern: /(?:output|reveal|show|print|display).*(?:system prompt|api key|password|secret|config)/i },
+    { name: 'Encoded Payload', pattern: /[A-Za-z0-9+/]{40,}={0,2}/i },
+    { name: 'Markdown/HTML Injection', pattern: /<script|<iframe|javascript:|onerror=|onload=/i },
+    { name: 'Indirect Prompt Injection', pattern: /(?:new instructions?|updated guidelines?|revised rules?).*(?:ignore|override|replace)/i },
+];
 
 const RagScanner = () => {
     const [file, setFile] = useState(null);
@@ -17,10 +28,7 @@ const RagScanner = () => {
         }
     };
 
-    const handleDragOver = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-    };
+    const handleDragOver = (e) => { e.preventDefault(); e.stopPropagation(); };
 
     const handleDrop = (e) => {
         e.preventDefault();
@@ -34,30 +42,52 @@ const RagScanner = () => {
 
     const startScan = async () => {
         if (!file) return;
-
         setIsScanning(true);
         setError(null);
         setResults(null);
 
-        const formData = new FormData();
-        formData.append('file', file);
-
         try {
-            const response = await fetch(`${api.baseURL}/api/rag/scan`, {
-                method: 'POST',
-                body: formData,
+            const text = await file.text();
+
+            // Simulate processing delay
+            await new Promise(r => setTimeout(r, 1500));
+
+            // Chunk the document (~500 chars per chunk)
+            const chunkSize = 500;
+            const chunks = [];
+            for (let i = 0; i < text.length; i += chunkSize) {
+                chunks.push(text.slice(i, i + chunkSize));
+            }
+
+            // Scan each chunk against patterns
+            let totalThreats = 0;
+            const chunkResults = chunks.map((chunk, idx) => {
+                let isThreat = false;
+                let matchedRule = null;
+
+                for (const pattern of INJECTION_PATTERNS) {
+                    if (pattern.pattern.test(chunk)) {
+                        isThreat = true;
+                        matchedRule = pattern.name;
+                        totalThreats++;
+                        break;
+                    }
+                }
+
+                return {
+                    chunk_id: idx + 1,
+                    is_threat: isThreat,
+                    matched_rule: matchedRule,
+                    text_preview: chunk.substring(0, 120) + (chunk.length > 120 ? '...' : ''),
+                };
             });
 
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const data = await response.json();
-            if (data.status === 'error') {
-                setError(data.message);
-            } else {
-                setResults(data);
-            }
+            setResults({
+                is_poisoned: totalThreats > 0,
+                total_chunks: chunks.length,
+                total_threats_found: totalThreats,
+                chunk_results: chunkResults,
+            });
         } catch (e) {
             setError(`Failed to scan document: ${e.message}`);
         } finally {
@@ -68,15 +98,14 @@ const RagScanner = () => {
     return (
         <div className="space-y-6 animate-fade-in">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-                {/* Upload Section */}
+                {/* Upload */}
                 <div className="glass-panel p-6 shadow-glow">
                     <h2 className="text-xl font-orbitron text-ns-blue mb-4 flex items-center">
                         <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                         RAG Context Poisoning Defense
                     </h2>
                     <p className="text-gray-400 text-sm mb-6 leading-relaxed">
-                        Upload text documents destined for Retrieval-Augmented Generation (RAG). The system will chunk the document and scan for hidden instructions, prompt injections, or adversarial payloads attempting to hijack the LLM's context window.
+                        Upload text documents destined for RAG. The system chunks and scans for hidden instructions, prompt injections, or adversarial payloads. <span className="text-emerald-400 font-mono text-xs">Client-side analysis — no backend needed.</span>
                     </p>
 
                     <div
@@ -85,13 +114,7 @@ const RagScanner = () => {
                         onDragOver={handleDragOver}
                         onDrop={handleDrop}
                     >
-                        <input
-                            type="file"
-                            ref={fileInputRef}
-                            onChange={handleFileChange}
-                            style={{ display: 'none' }}
-                            accept=".txt,.md,.csv"
-                        />
+                        <input type="file" ref={fileInputRef} onChange={handleFileChange} style={{ display: 'none' }} accept=".txt,.md,.csv,.json" />
                         <svg className={`w-12 h-12 mx-auto mb-4 ${file ? 'text-indigo-400' : 'text-gray-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
 
                         {file ? (
@@ -102,7 +125,7 @@ const RagScanner = () => {
                         ) : (
                             <div>
                                 <p className="text-gray-300">Click to upload or drag and drop</p>
-                                <p className="text-xs text-gray-500 mt-1">.TXT, .MD, .CSV support</p>
+                                <p className="text-xs text-gray-500 mt-1">.TXT, .MD, .CSV, .JSON support</p>
                             </div>
                         )}
                     </div>
@@ -128,14 +151,12 @@ const RagScanner = () => {
                     )}
                 </div>
 
-                {/* Results Section */}
+                {/* Results */}
                 <div className="glass-panel p-6 shadow-glow bg-[#0a0f18]">
                     <h3 className="text-lg font-orbitron text-gray-300 mb-4 border-b border-ns-dark-border pb-2">Analysis Report</h3>
 
                     {!results && !isScanning && (
-                        <div className="h-48 flex items-center justify-center text-gray-600 italic">
-                            Awaiting document ingestion...
-                        </div>
+                        <div className="h-48 flex items-center justify-center text-gray-600 italic">Awaiting document ingestion...</div>
                     )}
 
                     {isScanning && (
@@ -157,7 +178,7 @@ const RagScanner = () => {
                                     <p className="text-sm text-gray-400 mt-1">Processed {results.total_chunks} chunks</p>
                                 </div>
                                 <div className={`text-4xl font-orbitron ${results.is_poisoned ? 'text-red-500 shadow-text-glow' : 'text-green-500 text-shadow-glow'}`}>
-                                    {results.is_poisoned ? `${results.total_threats_found} Threats` : '0 Threats'}
+                                    {results.total_threats_found} Threats
                                 </div>
                             </div>
 
@@ -180,7 +201,6 @@ const RagScanner = () => {
                         </div>
                     )}
                 </div>
-
             </div>
         </div>
     );
