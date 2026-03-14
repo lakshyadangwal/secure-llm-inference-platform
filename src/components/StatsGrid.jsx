@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 
 const StatsGrid = ({ stats }) => {
   const statCards = [
@@ -21,12 +22,12 @@ const StatsGrid = ({ stats }) => {
   ];
 
   const colorMap = {
-    blue:    { bg: 'bg-blue-500/10',    text: 'text-blue-500',    border: 'border-blue-500/20',    gradient: 'from-blue-500 to-blue-400' },
+    blue: { bg: 'bg-blue-500/10', text: 'text-blue-500', border: 'border-blue-500/20', gradient: 'from-blue-500 to-blue-400' },
     emerald: { bg: 'bg-emerald-500/10', text: 'text-emerald-500', border: 'border-emerald-500/20', gradient: 'from-emerald-500 to-emerald-400' },
-    purple:  { bg: 'bg-purple-500/10',  text: 'text-purple-500',  border: 'border-purple-500/20',  gradient: 'from-purple-500 to-purple-400' },
-    cyan:    { bg: 'bg-cyan-500/10',    text: 'text-cyan-500',    border: 'border-cyan-500/20',    gradient: 'from-cyan-500 to-cyan-400' },
-    orange:  { bg: 'bg-orange-500/10',  text: 'text-orange-500',  border: 'border-orange-500/20',  gradient: 'from-orange-500 to-orange-400' },
-    red:     { bg: 'bg-red-500/10',     text: 'text-red-500',     border: 'border-red-500/20',     gradient: 'from-red-500 to-red-400' },
+    purple: { bg: 'bg-purple-500/10', text: 'text-purple-500', border: 'border-purple-500/20', gradient: 'from-purple-500 to-purple-400' },
+    cyan: { bg: 'bg-cyan-500/10', text: 'text-cyan-500', border: 'border-cyan-500/20', gradient: 'from-cyan-500 to-cyan-400' },
+    orange: { bg: 'bg-orange-500/10', text: 'text-orange-500', border: 'border-orange-500/20', gradient: 'from-orange-500 to-orange-400' },
+    red: { bg: 'bg-red-500/10', text: 'text-red-500', border: 'border-red-500/20', gradient: 'from-red-500 to-red-400' },
   };
 
   return (
@@ -36,19 +37,29 @@ const StatsGrid = ({ stats }) => {
         <p className="text-sm text-[var(--text-muted)]">Real-time security metrics and threat intelligence</p>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+      <motion.div
+        className="grid grid-cols-2 lg:grid-cols-4 gap-6"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1, transition: { staggerChildren: 0.15 } }}
+      >
         {statCards.map((stat, index) => {
           const c = colorMap[stat.color] || colorMap.cyan;
           return (
-            <div key={index}
-              className="group relative bg-[var(--card-bg)] backdrop-blur-xl rounded-2xl p-6 border border-[var(--border-primary)] hover:border-[var(--border-hover)] transition-all duration-300 overflow-hidden"
+            <motion.div
+              key={index}
+              variants={{ hidden: { opacity: 0, scale: 0.95, y: 15 }, visible: { opacity: 1, scale: 1, y: 0 } }}
+              initial="hidden"
+              animate="visible"
+              whileHover={{ y: -5, scale: 1.02 }}
+              transition={{ duration: 0.3, type: 'spring', stiffness: 300, damping: 20 }}
+              className="group relative bg-[var(--card-bg)] backdrop-blur-xl rounded-2xl p-6 border border-[var(--border-primary)] hover:border-[var(--border-hover)] hover:shadow-[0_8px_30px_rgba(6,182,212,0.15)] transition-all duration-300 overflow-hidden"
             >
               <div className={`absolute inset-0 bg-gradient-to-br ${c.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-300`}></div>
               <div className="relative z-10">
-                <div className={`w-12 h-12 rounded-xl ${c.bg} border ${c.border} flex items-center justify-center mb-4`}>
+                <div className={`w-12 h-12 rounded-xl ${c.bg} border ${c.border} flex items-center justify-center mb-4 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3`}>
                   <svg className={`w-6 h-6 ${c.text}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">{stat.icon}</svg>
                 </div>
-                <div className={`text-3xl font-bold ${c.text} mb-1`}>{stat.value}</div>
+                <div className={`text-3xl font-bold ${c.text} mb-1 drop-shadow-sm`}>{stat.value}</div>
                 <div className="text-xs text-[var(--text-muted)] font-mono uppercase tracking-wider mb-3">{stat.label}</div>
                 <div className="flex items-center gap-2">
                   <div className={`px-2 py-1 rounded ${c.bg} border ${c.border}`}>
@@ -58,10 +69,10 @@ const StatsGrid = ({ stats }) => {
                 </div>
               </div>
               <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[var(--border-hover)] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            </div>
+            </motion.div>
           );
         })}
-      </div>
+      </motion.div>
 
       <div className="mt-8 grid grid-cols-2 gap-6">
         {/* Threat Distribution */}

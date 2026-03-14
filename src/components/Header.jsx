@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
 import GoogleLogin from './GoogleLogin';
 
-const Header = ({ backendConnected = false, user, onLoginSuccess, onLogout }) => {
+const Header = ({ backendConnected = false, user, onLoginSuccess, onLogout, isDefending = true, onToggleDefense }) => {
   const { isDark, toggleTheme } = useTheme();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const settingsRef = useRef(null);
@@ -24,15 +24,23 @@ const Header = ({ backendConnected = false, user, onLoginSuccess, onLogout }) =>
       <div className="h-full px-8 flex items-center justify-between">
         {/* Logo */}
         <div className="flex items-center gap-4">
-          <div className="relative">
+          <motion.div
+            className="relative cursor-pointer"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
             <div className="absolute inset-0 bg-gradient-to-br from-cyan-500 to-blue-600 blur-xl opacity-50 animate-pulse"></div>
-            <div className="relative w-12 h-12 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-lg flex items-center justify-center">
+            <motion.div
+              className="relative w-12 h-12 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg"
+              whileHover={{ rotate: 180 }}
+              transition={{ duration: 0.4, ease: "easeInOut" }}
+            >
               <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                   d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
               </svg>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
           <div>
             <h1 className="text-2xl font-bold bg-gradient-to-r from-[var(--text-primary)] via-cyan-300 to-blue-400 bg-clip-text text-transparent tracking-tight">
               NEURO-SENTRY
@@ -54,6 +62,24 @@ const Header = ({ backendConnected = false, user, onLoginSuccess, onLogout }) =>
               }`}>
               MAINFRAME LINK: {backendConnected ? 'OK' : 'DEMO'}
             </span>
+          </div>
+
+          {/* Defense toggle — inline, no overlay */}
+          <div className="flex items-center gap-2 px-3 py-2 rounded-lg border bg-[var(--card-bg)] border-[var(--border-primary)]">
+            <div className={`w-2 h-2 rounded-full animate-pulse ${isDefending ? 'bg-emerald-500' : 'bg-red-500'}`} />
+            <span className={`text-xs font-mono tracking-wider ${isDefending ? 'text-emerald-400' : 'text-red-400'}`}>
+              {isDefending ? 'PROTECTED' : 'VULNERABLE'}
+            </span>
+            <button
+              onClick={onToggleDefense}
+              className={`relative ml-1 w-10 h-5 rounded-full transition-all duration-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 ${isDefending ? 'bg-emerald-500' : 'bg-red-500/60'
+                }`}
+              aria-pressed={isDefending}
+              aria-label="Toggle defense"
+            >
+              <span className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow-md transition-all duration-500 ${isDefending ? 'translate-x-5' : 'translate-x-0'
+                }`} />
+            </button>
           </div>
 
           {/* Google Login */}
