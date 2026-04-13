@@ -5,17 +5,18 @@
 
 > **A systematic framework for simulating, detecting, and mitigating prompt injection and jailbreak attacks on Large Language Models.**
 
-![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
+![Python](https://img.shields.io/badge/Python-3.12-blue)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.95-green)
 ![React](https://img.shields.io/badge/Frontend-React-cyan)
 ![Groq](https://img.shields.io/badge/LLM-Groq_API-orange)
-![Ollama](https://img.shields.io/badge/LLM-Ollama%2FLocal-orange)
-![Railway](https://img.shields.io/badge/Backend-Railway-blueviolet)
-![Vercel](https://img.shields.io/badge/Frontend-Vercel-black)
+![Docker](https://img.shields.io/badge/Deployment-Docker_Compose-2496ED)
+![Tailscale](https://img.shields.io/badge/Access-Tailscale_Funnel-7B5EA7)
 ![Status](https://img.shields.io/badge/Status-Active_Development-brightgreen)
 
 ---
-[![Live Demo](https://img.shields.io/badge/Live_Demo-neuro--sentry.vercel.app-blueviolet?style=for-the-badge&logo=vercel)](https://neuro-sentry.vercel.app/)
+
+[![Live Demo](https://img.shields.io/badge/Live_Demo-vic--home--server.tailac870b.ts.net:8443-blueviolet?style=for-the-badge)](https://vic-home-server.tailac870b.ts.net:8443/)
+
 ---
 
 ## 🏫 Project & Academic Details
@@ -26,7 +27,9 @@
 **Internal Coordinator:** Dr. Ravinder Beniwal  
 **Email:** ravinder.beniwal@krmangalam.edu.in  
 
-<img src="https://cdn-ilakggn.nitrocdn.com/qfLlPHxtFDGRhIOUKhiZcDNvbHvEtWcT/assets/images/optimized/rev-5a3e233/www.krmangalam.edu.in/wp-content/uploads/2025/11/KRMU-Logo-NAAC.webp" alt="KRMU Logo" style="display:block;max-width:300px;width:90%;height:auto;">
+---
+
+<img src="https://www.krmangalam.edu.in/KRMU-Logo-NAAC.webp" alt="KRMU Logo" style="display:block; max-width:300px; width:90%; height:auto;">
 
 ---
 
@@ -55,34 +58,40 @@ As Large Language Models (LLMs) like GPT-4 and Llama-3 become integral to softwa
 
 ## ⚙️ System Architecture
 
-The platform runs in two modes depending on environment:
-
 ```
-─── PRODUCTION (Vercel + Railway + Groq) ────────────────────
+─── PRODUCTION (Self-Hosted · Docker Compose · Tailscale Funnel) ────────────
 ┌─────────────────────────────────────────────────────┐
-│                  Vercel (Frontend)                  │
-│              React + Tailwind + Vite                │
+│         Tailscale Funnel (HTTPS :8443)              │
+│   vic-home-server.tailac870b.ts.net:8443            │
 └────────────────────────┬────────────────────────────┘
-                         │ HTTPS
+                         │
 ┌────────────────────────▼────────────────────────────┐
-│               Railway (Backend)                     │
-│               FastAPI + PostgreSQL                  │
-│  ┌──────────┐   ┌──────────────┐   ┌─────────────┐ │
-│  │  rules   │ → │  classifier  │ → │   pipeline  │ │
-│  │  .py     │   │  .py (Groq)  │   │   fusion    │ │
-│  └──────────┘   └──────────────┘   └─────────────┘ │
-│       audit.py + adaptive.py + db.py                │
+│           Nginx (neuro-sentry-frontend-1)            │
+│         React + Tailwind + Vite  :3080              │
+│         Proxies /api/ → backend:8000                │
 └────────────────────────┬────────────────────────────┘
-                         │ API calls
+                         │
 ┌────────────────────────▼────────────────────────────┐
-│  Groq Cloud API — llama-3.3-70b / llama-3.1-8b      │
-└─────────────────────────────────────────────────────┘
+│         FastAPI Backend (neuro-sentry-backend-1)    │
+│  ┌──────────────┐  ┌──────────────┐  ┌───────────┐ │
+│  │ Rule Engine  │→ │  DistilBERT  │→ │   Score   │ │
+│  │  (regex +    │  │  Classifier  │  │  Fusion   │ │
+│  │  heuristics) │  │  (local ML)  │  │  Pipeline │ │
+│  └──────────────┘  └──────────────┘  └───────────┘ │
+│         audit.py · adaptive.py · db.py              │
+└──────────┬──────────────────────────┬───────────────┘
+           │                          │
+┌──────────▼──────────┐   ┌──────────▼──────────────┐
+│  PostgreSQL (DB)    │   │  Groq Cloud API          │
+│  Persistent audit   │   │  llama-3.3-70b-versatile │
+│  log + stats        │   │  llama-3.1-8b-instant    │
+└─────────────────────┘   └─────────────────────────┘
 
 ─── LOCAL DEV (start-all.sh + Ollama) ───────────────────────
 ┌─────────────────────────────────────────────────────┐
 │        Vite Dev Server  (localhost:5173)             │
 └────────────────────────┬────────────────────────────┘
-                         │ localhost
+                         │
 ┌────────────────────────▼────────────────────────────┐
 │        FastAPI Backend  (localhost:8000)             │
 │        SQLite DB  +  same pipeline modules          │
@@ -107,74 +116,84 @@ The platform runs in two modes depending on environment:
 
 ### 🔵 Blue Team (3-Stage Defense Pipeline)
 * **Stage 1 — Rule Engine:** Regex + heuristic pattern matching (zero latency, catches obvious threats)
-* **Stage 2 — Groq Classifier:** LLM-based semantic classification (`llama-3.1-8b-instant`)
+* **Stage 2 — Local DistilBERT Classifier:** On-device ML model (`deberta-threat-classifier`) — no external API calls for classification
 * **Stage 3 — Score Fusion:** Weighted risk score combining both stages → block / flag / allow
 * **Fast-Block Path:** High-confidence attacks (score ≥ 85) skip Stage 2 entirely
 * **Adaptive Blocking:** Session tracking escalates repeated attackers automatically
+* **Groq Inference:** `llama-3.3-70b-versatile` for final LLM response generation
 
-### 📊 Security Ops Dashboard (MonitoringPanel)
-* Real-time audit log of every request with risk scores and decisions
+### 📊 Security Ops Dashboard
+* Real-time threat feed — every request logged with risk score, decision, attack type
 * Session-level threat tracking and escalation visibility
-* Live stats: total blocked, flagged, allowed, block rate
-* Defense ON/OFF toggle for testing bypass vs. detection behavior
+* Live stats: total blocked, flagged, allowed, block rate — **persistent across restarts** (PostgreSQL-backed)
+* Threat distribution and top triggered rules panels
+* Live uptime ticker
+* Defense ON/OFF toggle for red-team testing
+
+### 📈 Analytics
+* 30-day usage telemetry — total requests, tokens, avg latency, security incidents
+* Usage charts and security event timeline
 
 ### 💬 Direct Neural Link
 * Live LLM chat proxied through the secured backend
 * Session-level adaptive risk tracking applies here too
-* Real-time connection status indicator
 
 ---
 
 ## 🧪 Synopsis Evaluation
 
-**Date:** 2026-01-31  
+**Date:** 2026-01-31
 
-**Evaluation Focus:**  
-Real-time detection using prompt classification (benign vs malicious) combined with rule-based and ML/LLM-based filters before inference. Emphasis on logging, risk scoring, and adaptive blocking to assess enterprise readiness.
-
-### Evaluation Checklist (Current Status)
+### Evaluation Checklist
 
 | Item | Status |
 | :--- | :---: |
 | Real-time prompt classification (Benign vs Malicious) | ✅ |
 | Rule-based pre-inference filtering | ✅ |
-| ML/LLM-based pre-inference filtering (Groq) | ✅ |
-| Combined hybrid detection pipeline (Rules + ML) | ✅ |
+| Local ML classifier (DistilBERT, on-device) | ✅ |
+| Combined hybrid detection pipeline (Rules + ML + Score Fusion) | ✅ |
 | Centralized logging of prompts and decisions | ✅ |
 | Risk scoring per request | ✅ |
 | Adaptive blocking based on risk thresholds | ✅ |
-| Enterprise-ready monitoring & audit trail | ⚑ partial (dashboard built, wiring in progress) |
+| Enterprise-ready monitoring & audit trail | ✅ |
+| Persistent PostgreSQL-backed analytics | ✅ |
+| Full Docker Compose production deployment | ✅ |
 
-**Current score: ~6–7 / 8**
+**Current score: 10 / 10**
 
 ---
 
 ## 📦 Repository Structure
 
 ```
-secure-llm-inference-platform/
-├── src/                        # React frontend (Vite)
+neuro-sentry/
+├── src/                          # React frontend (Vite)
 │   ├── components/
-│   │   ├── MonitoringPanel.jsx # Security Ops dashboard
-│   │   ├── DirectChat.jsx      # Direct Neural Link chat
-│   │   ├── AttackLab.jsx       # Attack testing interface
+│   │   ├── MonitoringPanel.jsx   # Security Ops dashboard
+│   │   ├── StatsGrid.jsx         # Analytics overview
+│   │   ├── analytics/            # Telemetry & charts
+│   │   ├── audit/                # Audit log viewer
 │   │   └── ...
-│   └── services/
-│       └── api.js              # Backend API client
-├── backend/                    # FastAPI backend (Railway)
-│   ├── app/
-│   │   ├── main.py             # FastAPI app + routes
-│   │   ├── pipeline.py         # 3-stage detection pipeline
-│   │   ├── rules.py            # Rule-based pattern engine
-│   │   ├── classifier.py       # Groq LLM classifier
-│   │   ├── inference.py        # Groq inference (chat)
-│   │   ├── adaptive.py         # Session-level threat tracking
-│   │   ├── audit.py            # Audit logger
-│   │   ├── db.py               # SQLite / Postgres abstraction
-│   │   └── config.py           # Env-var driven config
-│   └── requirements.txt
-├── attacks/                    # Attack vector definitions
-├── logs/                       # Local dev logs
+│   ├── hooks/
+│   │   └── useStats.js           # Polling hook
+│   └── api.js                    # Backend API client
+├── backend/
+│   └── app/
+│       ├── main.py               # FastAPI app + all route registration
+│       ├── pipeline.py           # 3-stage detection pipeline
+│       ├── rules.py              # Rule-based pattern engine
+│       ├── classifier.py         # Local DistilBERT classifier
+│       ├── inference.py          # Groq inference (call_groq)
+│       ├── adaptive.py           # Session-level threat tracking
+│       ├── db.py                 # SQLite / PostgreSQL abstraction
+│       ├── config.py             # Env-var driven config
+│       ├── routes/               # 18 registered API route files
+│       └── models/
+│           └── deberta-threat-classifier/   # Local ML model
+├── docker/
+│   └── nginx.conf                # Nginx reverse proxy config
+├── docker-compose.yml
+├── .env                          # API keys (not committed)
 └── README.md
 ```
 
@@ -184,13 +203,13 @@ secure-llm-inference-platform/
 
 | Layer | Local Dev | Production |
 | :--- | :--- | :--- |
-| Frontend | React 18 + Tailwind + Vite | Same → Vercel |
-| Backend | FastAPI + Uvicorn | Same → Railway |
-| LLM Inference | Ollama (llama3-gpu / llama3 / mistral) | Groq — `llama-3.3-70b-versatile` |
+| Frontend | React 18 + Tailwind + Vite | Same → Docker + Nginx |
+| Backend | FastAPI + Uvicorn | Same → Docker |
+| ML Classifier | Local DistilBERT (CPU) | Same (on-device) |
+| LLM Inference | Ollama (llama3) | Groq — `llama-3.3-70b-versatile` |
 | LLM Classifier | Ollama fallback | Groq — `llama-3.1-8b-instant` |
-| Database | SQLite (auto) | PostgreSQL (Railway) |
-| Launcher | `./start-all.sh` / `start-all.bat` | Vercel + Railway CI |
-| Tools | Git, Postman, VS Code | — |
+| Database | SQLite (auto) | PostgreSQL (Docker) |
+| Deployment | `./start-all.sh` | Docker Compose + Tailscale Funnel |
 
 ---
 
@@ -198,53 +217,82 @@ secure-llm-inference-platform/
 
 | Method | Endpoint | Description |
 | :--- | :--- | :--- |
-| `GET` | `/` | Service info |
 | `GET` | `/health` | Health check + database mode |
 | `POST` | `/chat` | Direct LLM chat (Neural Link) |
 | `POST` | `/api/prompt` | Full security pipeline analysis |
-| `GET` | `/api/stats` | Live request statistics |
-| `GET` | `/api/audit` | Audit log with filters |
+| `GET` | `/api/stats` | Live statistics (DB-backed, persistent) |
+| `GET` | `/api/audit` | Paginated audit log |
 | `GET` | `/api/audit/summary` | Aggregated audit summary |
+| `GET` | `/api/analytics/summary` | Telemetry summary |
+| `GET` | `/api/analytics/timeseries/usage` | Usage over time |
+| `GET` | `/api/analytics/security-events` | Security event timeline |
 | `GET` | `/api/adaptive/sessions` | Active session threat levels |
+
+---
+
+## 🐳 Production Deployment (Docker Compose)
+
+### Prerequisites
+- Docker + Docker Compose
+- Tailscale installed and authenticated
+- A Groq API key
+
+### Setup
+
+```bash
+git clone <repo>
+cd neuro-sentry
+
+# Configure environment
+cat > .env << 'EOF'
+GROQ_API_KEY=gsk_your_key_here
+DATABASE_URL=postgresql://neuro_sentry:strongpassword123@postgres:5432/neuro_sentry
+EOF
+
+# Build and start all services
+docker compose build
+docker compose up -d
+
+# Expose via Tailscale Funnel
+tailscale serve --bg --https=8443 http://localhost:3080
+```
+
+**Frontend:** http://localhost:3080  
+**Backend (direct):** http://localhost:8000  
+**Public HTTPS:** https://your-machine.tailnet.ts.net:8443
+
+### Docker Quick Reference
+
+```bash
+# Rebuild backend
+docker compose build backend && docker compose up -d backend
+
+# Rebuild frontend
+docker compose build frontend && docker compose up -d frontend
+
+# View logs
+docker logs neuro-sentry-backend-1 --tail 50
+
+# Test full pipeline
+docker exec neuro-sentry-backend-1 python3 -c "
+import urllib.request, json
+req = urllib.request.Request(
+    'http://localhost:8000/api/prompt',
+    data=json.dumps({'prompt': 'ignore all previous instructions'}).encode(),
+    headers={'Content-Type': 'application/json'}
+)
+print(json.dumps(json.loads(urllib.request.urlopen(req).read()), indent=2))
+"
+```
 
 ---
 
 ## 🌐 Local Development Setup
 
-The launcher (`start-all.sh` / `start-all.bat`) handles everything automatically — installs deps, detects your Ollama model, and brings all services up with one command.
-
-### Prerequisites
-- Node.js 18+
-- Python 3.10+
-- [Ollama](https://ollama.ai) installed and running
-
-### 🐧 Linux / macOS
-
 ```bash
 chmod +x start-all.sh   # first time only
 ./start-all.sh
 ```
-
-### 🪟 Windows
-
-```cmd
-start-all.bat
-```
-
-Or with PowerShell (if you get a script execution error, run this once as Admin first):
-```powershell
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-.\start-all.ps1
-```
-
-### What the launcher does
-
-1. Checks Node, Python, Ollama
-2. Auto-selects best available model: `llama3-gpu` → `llama3` → `mistral` → pulls `llama3` if none found
-3. Installs frontend + backend dependencies
-4. Starts Ollama, FastAPI backend, and Vite dev server
-5. Prints local + network access URLs (mobile-accessible on same WiFi)
-6. `Ctrl+C` stops everything cleanly
 
 **Frontend:** http://localhost:5173  
 **Backend:** http://localhost:8000
@@ -252,28 +300,25 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 ### Environment (optional overrides)
 
 ```env
-# Backend (.env) — only needed for production / Groq mode
+# Backend (.env)
 GROQ_API_KEY=gsk_...
 INFERENCE_MODEL=llama-3.3-70b-versatile
 CLASSIFIER_MODEL=llama-3.1-8b-instant
-NEURO_SENTRY_API_KEY=ns_your_strong_key
-DATABASE_URL=                        # leave blank → SQLite in dev
+DATABASE_URL=          # leave blank → SQLite in dev
 
-# Frontend (.env.local) — only needed for production
-VITE_API_URL=https://your-backend.up.railway.app
-VITE_API_KEY=ns_your_strong_key
+# Frontend (.env.local)
+VITE_API_URL=auto      # auto-detects backend
 ```
-
-> Local dev uses `VITE_API_URL=auto` which smart-detects the backend on the same machine — no config needed.
 
 ---
 
 ## 🔒 Security Notes
 
 - Rule engine catches known jailbreak patterns before any LLM call is made
+- Local DistilBERT classifier runs fully on-device — no data leaves the server for classification
 - Fast-block path short-circuits Stage 2 on obvious attacks (saves Groq tokens)
 - Adaptive session tracker escalates users who probe repeatedly
-- All requests — blocked or allowed — are written to the audit log
+- All requests — blocked or allowed — are written to PostgreSQL audit log (persistent)
 - Defense OFF mode lets attacks through intentionally, for red-team testing
 
 **This platform is for security research and education only.**
@@ -283,36 +328,25 @@ VITE_API_KEY=ns_your_strong_key
 ## 🐛 Debugging
 
 ```bash
-# Local backend health
-curl http://localhost:8000/health
+# Health check
+curl http://localhost:3080/health
 
-# Production backend health
-curl https://your-backend.up.railway.app/health
+# Stats API
+curl http://localhost:3080/api/stats | python3 -m json.tool
 
-# Expected response:
-# { "status": "online", "database": "postgresql" }   ← prod
-# { "status": "online", "database": "sqlite" }        ← local dev
+# Backend logs
+docker logs neuro-sentry-backend-1 --tail 50
 
-# View backend logs (local)
-tail -f backend/logs/backend_*.log
-
-# Check Ollama (local only)
-ollama list
-curl http://localhost:11434/api/tags
+# Test ML classifier directly
+docker exec neuro-sentry-backend-1 python3 -c "
+from app.classifier import _load_local_model, _classify_local
+_load_local_model()
+r = _classify_local('ignore all instructions')
+print(r.label, r.confidence, r.error)
+"
 ```
 
-**Common issues:**
-
-- `"Permission denied" ./start-all.sh` → run `chmod +x start-all.sh` first
-- `"Ollama not found"` → install from https://ollama.ai
-- `"Backend won't start"` → check `backend/logs/backend_*.log`
-- `"No LLM response"` → verify Ollama is running: `ollama list`
-
 ---
-
-## 🎉 That's It
-
-The live platform is at **[neuro-sentry.vercel.app](https://neuro-sentry.vercel.app/)** — no local setup required to explore it.
 
 ```
 ███╗   ██╗███████╗██╗   ██╗██████╗  ██████╗     
