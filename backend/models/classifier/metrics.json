@@ -1,0 +1,45 @@
+{
+  "model": "distilbert-base-uncased",
+  "dataset_size": 10690,
+  "train_size_raw": 7482,
+  "train_size_augmented": 10998,
+  "val_size": 1603,
+  "test_size": 1604,
+  "split": "70/15/15",
+  "augmentation": "train-only (minority class balancing)",
+  "epochs_trained": 4,
+  "batch_size": 16,
+  "learning_rate": 3e-05,
+  "max_length": 256,
+  "class_weights": {
+    "benign": 1.0,
+    "malicious": 1.0
+  },
+  "precision_mode": "BF16",
+  "training_time_sec": 393.9,
+  "contamination_check": "passed",
+  "test_metrics": {
+    "accuracy": 0.9738,
+    "f1": 0.9505,
+    "precision": 0.9527,
+    "recall": 0.9482,
+    "fpr": 0.017,
+    "confusion_matrix": [
+      [
+        1159,
+        20
+      ],
+      [
+        22,
+        403
+      ]
+    ]
+  },
+  "val_metrics": {
+    "loss": 0.1056,
+    "accuracy": 0.9688,
+    "f1": 0.9416,
+    "precision": 0.935,
+    "recall": 0.9482
+  }
+}

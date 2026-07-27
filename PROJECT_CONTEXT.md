@@ -7,7 +7,7 @@
 
 - **Name**: Neuro-Sentry Defense
 - **Version**: 2.0.0
-- **Purpose**: Real-time LLM security platform — a firewall for AI. Intercepts prompts before they reach the LLM, runs them through a 3-stage defense pipeline (rules → ML classifier → score fusion), and blocks/flags/allows based on risk scores.
+- **Purpose**: Real-time LLM security platform — a firewall for AI. Intercepts prompts before they reach the LLM, runs them through a 3-stage defense pipeline (217 regex rules across 14 categories → ML classifier → score fusion), and blocks/flags/allows based on risk scores.
 - **Architecture**: React 18 frontend + FastAPI Python backend + Groq LLM API
 - **Standalone Mode**: Frontend works fully without backend — demo data + localStorage fallback
 
@@ -113,7 +113,7 @@ neuro-sentry-llm-threat-detection/
 │   ├── app/
 │   │   ├── main.py               # FastAPI app — all route definitions
 │   │   ├── pipeline.py           # 3-stage defense pipeline orchestrator
-│   │   ├── rules.py              # Rule definitions and matching logic
+│   │   ├── rules.py              # 217 rules across 14 categories + input normalizer
 │   │   ├── rules_engine.py       # Rule engine execution
 │   │   ├── classifier.py         # Groq ML classifier integration
 │   │   ├── inference.py          # LLM inference (Groq API)
@@ -157,12 +157,16 @@ User Prompt
     │
     ▼
 ┌──────────────────────────────────────────┐
-│  STAGE 1: RULE ENGINE                    │
-│  - Regex pattern matching                │
-│  - Keyword blacklist matching            │
-│  - Default rules: SQLi, Jailbreak,       │
-│    PII extraction, System prompt leak,   │
-│    Base64 encoded payloads               │
+│  STAGE 1: RULE ENGINE (217 rules)        │
+│  - Input normalizer: zero-width strip,   │
+│    NFKC, base64/hex/URL decode, leet,    │
+│    word-splitting, reversed text detect   │
+│  - 14 categories: jailbreak, injection,  │
+│    extraction, encoding, social, priv,   │
+│    roleplay, manipulation, dangerous,    │
+│    token_manip, context_overflow,        │
+│    indirect_injection, model_extraction, │
+│    multi_agent_attack                    │
 │  - If score > FAST_BLOCK_THRESHOLD (85): │
 │    → Immediately BLOCK (skip Stage 2+3)  │
 │  - Output: rule_score (0-100)            │
@@ -381,7 +385,7 @@ VITE_GOOGLE_CLIENT_ID=                  # Google OAuth client ID
 |--------|---------|
 | `main.py` | FastAPI app with all route definitions |
 | `pipeline.py` | 3-stage orchestrator: rules → classifier → fusion |
-| `rules.py` + `rules_engine.py` | Rule definitions, regex/keyword matching, scoring |
+| `rules.py` + `rules_engine.py` | 217 rules across 14 categories, input normalizer, regex matching, scoring |
 | `classifier.py` | Groq API integration for prompt classification |
 | `inference.py` | Groq API integration for LLM response generation |
 | `audit.py` | SQLite/PostgreSQL audit logging with CRUD |

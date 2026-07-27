@@ -137,6 +137,10 @@ POST   /api/prompt          # Analyze prompts
   Response: {
     response: string,
     breach_detected: boolean,
+    local_classification: {
+      label: string,
+      confidence: number
+    },
     stats?: {...}
   }
 

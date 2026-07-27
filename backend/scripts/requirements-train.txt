@@ -1,0 +1,11 @@
+# Training-only dependencies for Phase 5 DeBERTa fine-tuning
+# Install with: pip install -r backend/scripts/requirements-train.txt
+torch>=2.0
+transformers>=4.40
+datasets>=2.19
+scikit-learn>=1.4
+accelerate>=0.30
+pandas
+sentencepiece
+protobuf
+tiktoken
