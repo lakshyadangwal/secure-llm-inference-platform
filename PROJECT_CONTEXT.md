@@ -139,7 +139,6 @@ neuro-sentry-llm-threat-detection/
 │
 ├── docker/                        # Docker configuration
 ├── deploy/                        # Deployment scripts
-├── docs/                          # Documentation (11 files)
 ├── .env.example                   # Environment variable template
 ├── docker-compose.yml             # Docker Compose for full stack
 ├── package.json                   # NPM dependencies

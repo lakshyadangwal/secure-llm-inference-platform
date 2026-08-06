@@ -193,16 +193,6 @@ secure-llm-inference-platform/
 │   ├── Dockerfile              # Backend: Python 3.12 + PyTorch CPU
 │   ├── Dockerfile.frontend     # Frontend: Node 20 → Nginx Alpine
 │   └── nginx.conf              # SPA routing + /api/ proxy + SSE
-├── docs/                       # 📚 Full Obsidian documentation vault
-│   ├── README.md               # Documentation index
-│   ├── architecture.md         # System architecture
-│   ├── getting-started.md      # Setup guide
-│   ├── pipeline.md             # Pipeline deep dive
-│   ├── rules-engine.md         # All rules reference
-│   ├── ml-classifier.md        # DistilBERT model details
-│   ├── red-team.md             # Batch testing guide
-│   ├── deployment.md           # Docker, Tailscale, production
-│   └── api-reference.md        # Full API docs
 ├── docker-compose.yml          # Two services: backend + frontend
 ├── .dockerignore
 ├── .env.example
@@ -292,25 +282,6 @@ WEIGHT_LLM=0.6            # ML score weight (default: 0.6)
 | `POST` | `/api/batch` | Batch prompt analysis (SSE streaming) |
 | `GET` | `/api/config` | Current pipeline configuration |
 | `GET` | `/api/logs` | Audit log with filters |
-
-See [`docs/api-reference.md`](docs/api-reference.md) for full request/response examples.
-
----
-
-## 📚 Documentation
-
-Full documentation is in the [`docs/`](docs/) folder — open it as an Obsidian vault for the best experience with interlinked pages:
-
-| Document | Description |
-|---|---|
-| [Architecture](docs/architecture.md) | System design, defense layers, data flow |
-| [Getting Started](docs/getting-started.md) | Installation, setup, start/stop |
-| [Pipeline](docs/pipeline.md) | Detection stages, score fusion, extending |
-| [Rules Engine](docs/rules-engine.md) | All 50+ rules, categories, adding new ones |
-| [ML Classifier](docs/ml-classifier.md) | DistilBERT model, thresholds, retraining |
-| [Red Team](docs/red-team.md) | Batch testing, file formats, exports |
-| [Deployment](docs/deployment.md) | Docker Compose, Tailscale, Nginx/Caddy |
-| [API Reference](docs/api-reference.md) | All endpoints with examples |
 
 ---
 
