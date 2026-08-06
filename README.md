@@ -9,7 +9,7 @@
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.115-green)
 ![React](https://img.shields.io/badge/Frontend-React_18-cyan)
 ![Groq](https://img.shields.io/badge/LLM-Groq_API-orange)
-![DeBERTa](https://img.shields.io/badge/ML-DeBERTa_v3-red)
+![DistilBERT](https://img.shields.io/badge/ML-DistilBERT-red)
 ![Docker](https://img.shields.io/badge/Deploy-Docker_Compose-2496ED)
 ![Status](https://img.shields.io/badge/Status-Production_Ready-brightgreen)
 
@@ -67,7 +67,7 @@ As Large Language Models (LLMs) like GPT-4 and Llama-3 become integral to softwa
 │  ┌──────────┐   ┌──────────────┐   ┌───────────────┐           │
 │  │ Stage 1  │──▶│   Stage 2    │──▶│   Stage 3     │──▶ Decision│
 │  │ Rule     │   │ Local ML     │   │ Score Fusion  │   block   │
-│  │ Engine   │   │ (DeBERTa v3) │   │ + Critical    │   flag    │
+│  │ Engine   │   │ (DistilBERT) │   │ + Critical    │   flag    │
 │  │ 217 rules│   │ GPU/CPU      │   │   Rule Floor  │   allow   │
 │  └──────────┘   └──────────────┘   └───────────────┘           │
 │       │                                                         │
@@ -94,7 +94,7 @@ As Large Language Models (LLMs) like GPT-4 and Llama-3 become integral to softwa
 
 ### 🔵 Blue Team (4-Stage Defense Pipeline)
 * **Stage 1 — Rule Engine:** 217 regex patterns across 14 categories with input normalization (~0.9ms)
-* **Stage 2 — Local ML Classifier:** Fine-tuned DeBERTa v3 running on GPU/CPU (~7-9ms)
+* **Stage 2 — Local ML Classifier:** Fine-tuned DistilBERT running on GPU/CPU (~7-9ms)
 * **Stage 3 — Score Fusion:** Weighted combination with critical rule floor + obfuscation penalty
 * **Fast-Block Path:** High-confidence rule matches (score ≥ 85) skip ML stage entirely
 * **Adaptive Blocking:** Session tracking escalates repeated attackers (multiplier up to 2.0×)
@@ -171,7 +171,7 @@ secure-llm-inference-platform/
 │       ├── main.py             # FastAPI app, routes, lifespan
 │       ├── pipeline.py         # 4-stage detection pipeline
 │       ├── rules.py            # 217 regex rules (14 categories) + input normalizer
-│       ├── classifier.py       # Local DeBERTa + Groq fallback
+│       ├── classifier.py       # Local DistilBERT + Groq fallback
 │       ├── inference.py        # Groq API for LLM responses
 │       ├── batch.py            # Red Team batch endpoint (SSE)
 │       ├── adaptive.py         # Session-based risk escalation
@@ -199,7 +199,7 @@ secure-llm-inference-platform/
 │   ├── getting-started.md      # Setup guide
 │   ├── pipeline.md             # Pipeline deep dive
 │   ├── rules-engine.md         # All rules reference
-│   ├── ml-classifier.md        # DeBERTa model details
+│   ├── ml-classifier.md        # DistilBERT model details
 │   ├── red-team.md             # Batch testing guide
 │   ├── deployment.md           # Docker, Tailscale, production
 │   └── api-reference.md        # Full API docs
@@ -216,7 +216,7 @@ secure-llm-inference-platform/
 | Layer | Technology | Details |
 | :--- | :--- | :--- |
 | Backend | FastAPI + Python 3.12 | API server, pipeline orchestration |
-| ML Model | DeBERTa v3 (fine-tuned) | Local binary classifier (benign/malicious) |
+| ML Model | DistilBERT (fine-tuned) | Local binary classifier (benign/malicious) |
 | ML Runtime | PyTorch (CPU/GPU) | ~8ms GPU, ~50ms CPU inference |
 | LLM | Groq API (Llama 3.3 70B) | Response generation + classifier fallback |
 | Frontend | React 18 + Vite + Tailwind | Security dashboard with 5 tabs |
@@ -307,7 +307,7 @@ Full documentation is in the [`docs/`](docs/) folder — open it as an Obsidian 
 | [Getting Started](docs/getting-started.md) | Installation, setup, start/stop |
 | [Pipeline](docs/pipeline.md) | Detection stages, score fusion, extending |
 | [Rules Engine](docs/rules-engine.md) | All 50+ rules, categories, adding new ones |
-| [ML Classifier](docs/ml-classifier.md) | DeBERTa model, thresholds, retraining |
+| [ML Classifier](docs/ml-classifier.md) | DistilBERT model, thresholds, retraining |
 | [Red Team](docs/red-team.md) | Batch testing, file formats, exports |
 | [Deployment](docs/deployment.md) | Docker Compose, Tailscale, Nginx/Caddy |
 | [API Reference](docs/api-reference.md) | All endpoints with examples |

@@ -1,4 +1,4 @@
-# Training-only dependencies for Phase 5 DeBERTa fine-tuning
+# Training-only dependencies for Phase 5 DistilBERT fine-tuning
 # Install with: pip install -r backend/scripts/requirements-train.txt
 torch>=2.0
 transformers>=4.40

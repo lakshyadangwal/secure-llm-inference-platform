@@ -8,9 +8,9 @@ Neuro-Sentry now features a **locally fine-tuned DistilBERT classifier**, making
 
 ## ⚡ PERFORMANCE BUMP
 - **Latency:** ~200ms (Groq) → **~8ms** (Local DistilBERT)
-- **Accuracy:** 97% on eval set
-- **Precision:** 100% (Zero false positives in testing)
-- **Recall:** 91.5%
+- **Accuracy:** 97.4% on held-out test split · 76% on the 150 unseen-prompt pipeline eval (see README)
+- **Precision:** 95.3% (1.7% false-positive rate)
+- **Recall:** 94.8%
 
 ---
 

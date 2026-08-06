@@ -1,6 +1,6 @@
 """
 Neuro-Sentry Classifier — Phase 5
-Local DeBERTa-first with Groq API fallback.
+Local DistilBERT-first with Groq API fallback.
 Always returns a ClassifierResult — never raises.
 """
 
@@ -104,7 +104,7 @@ def _fallback(reason: str, latency: float) -> ClassifierResult:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Local DeBERTa classifier (Phase 5)
+# Local DistilBERT classifier (Phase 5)
 # ─────────────────────────────────────────────────────────────────────────────
 
 _local_model = None
@@ -114,7 +114,7 @@ _local_load_attempted = False
 
 
 def _load_local_model():
-    """Load DeBERTa model once at first use. Thread-safe via flag."""
+    """Load DistilBERT model once at first use. Thread-safe via flag."""
     global _local_model, _local_tokenizer, _local_device, _local_load_attempted
 
     if _local_load_attempted:
@@ -131,7 +131,7 @@ def _load_local_model():
         import torch
         from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
-        logger.info(f"Loading local DeBERTa from {model_path}...")
+        logger.info(f"Loading local DistilBERT from {model_path}...")
         start = time.time()
 
         _local_tokenizer = AutoTokenizer.from_pretrained(model_path)
@@ -149,7 +149,7 @@ def _load_local_model():
         _local_model.eval()  # inference mode
 
         elapsed = (time.time() - start) * 1000
-        logger.info(f"Local DeBERTa ready in {elapsed:.0f}ms")
+        logger.info(f"Local DistilBERT ready in {elapsed:.0f}ms")
         return True
 
     except ImportError as e:
@@ -161,7 +161,7 @@ def _load_local_model():
 
 
 def _classify_local(prompt: str) -> ClassifierResult:
-    """Run local DeBERTa inference. ~5–15ms."""
+    """Run local DistilBERT inference. ~5–15ms."""
     import torch
 
     start = time.time()
@@ -209,11 +209,11 @@ def _classify_local(prompt: str) -> ClassifierResult:
         if label == "malicious":
             severity = min(10, max(1, int(confidence * 10)))
             attack_type = "detected_by_ml"
-            reasoning = f"Local DeBERTa classified as malicious (conf={confidence:.2f})"
+            reasoning = f"Local DistilBERT classified as malicious (conf={confidence:.2f})"
         else:
             severity = 0
             attack_type = "none"
-            reasoning = f"Local DeBERTa classified as benign (conf={confidence:.2f})"
+            reasoning = f"Local DistilBERT classified as benign (conf={confidence:.2f})"
 
         result = ClassifierResult(
             label=label,

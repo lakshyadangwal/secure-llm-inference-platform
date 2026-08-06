@@ -129,7 +129,7 @@ neuro-sentry-llm-threat-detection/
 │   │   └── requirements.txt      # Python dependencies
 │   │
 │   ├── scripts/
-│   │   ├── train_classifier.py   # Train local DeBERTa threat classifier
+│   │   ├── train_classifier.py   # Train local DistilBERT threat classifier
 │   │   ├── collect_dataset.py    # Collect training data from prompts
 │   │   └── export_audit_as_training_data.py  # Export audit logs as training CSV
 │   │
@@ -178,7 +178,7 @@ User Prompt
 │  - Model: llama-3.1-8b-instant           │
 │  - Classification: benign / malicious    │
 │  - Confidence: 0.0 to 1.0               │
-│  - Optional local DeBERTa fallback       │
+│  - Optional local DistilBERT fallback    │
 │  - Output: ml_label, ml_confidence       │
 └──────────────┬───────────────────────────┘
                │
@@ -338,7 +338,7 @@ User Prompt
 GROQ_API_KEY=gsk_...                    # Groq API key for ML classifier + inference
 INFERENCE_MODEL=llama-3.3-70b-versatile # Model for LLM responses
 CLASSIFIER_MODEL=llama-3.1-8b-instant   # Model for threat classification
-LOCAL_ML_MODEL_PATH=backend/models/deberta-threat-classifier  # Optional local model
+LOCAL_ML_MODEL_PATH=backend/models/deberta-threat-classifier  # Optional local model (DistilBERT)
 DATABASE_URL=                           # PostgreSQL URL (blank = SQLite fallback)
 NEURO_SENTRY_API_KEY=                   # API key for route protection (blank = no auth)
 BLOCK_THRESHOLD=65                      # Risk score threshold for blocking
